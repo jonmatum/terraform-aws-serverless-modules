@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 6.18.0"
     }
   }
 }
@@ -142,7 +142,7 @@ resource "aws_iam_role" "ecs_task" {
   tags = var.tags
 }
 
-# Security Groups
+# Security Group for ECS tasks
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-ecs-tasks"
   description = "Security group for ECS tasks"
@@ -169,33 +169,79 @@ resource "aws_security_group" "ecs_tasks" {
   })
 }
 
-resource "aws_security_group" "vpc_link" {
-  name        = "${var.project_name}-vpc-link"
-  description = "Security group for VPC Link"
-  vpc_id      = module.vpc.vpc_id
+# IAM Role for AgentCore Gateway
+resource "aws_iam_role" "gateway" {
+  name = "${var.project_name}-gateway-role"
 
-  egress {
-    description = "All outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "bedrock-agentcore.amazonaws.com"
+      }
+    }]
+  })
 
-  tags = merge(var.tags, {
-    Name = "${var.project_name}-vpc-link"
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy" "gateway" {
+  name = "${var.project_name}-gateway-policy"
+  role = aws_iam_role.gateway.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:*:log-group:/aws/bedrock-agentcore/*"
+      }
+    ]
   })
 }
 
-# Allow VPC Link to reach ALB
-resource "aws_security_group_rule" "vpc_link_to_alb" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  security_group_id        = module.alb.alb_security_group_id
-  source_security_group_id = aws_security_group.vpc_link.id
-  description              = "Allow VPC Link to reach ALB"
+# AgentCore Gateway
+resource "aws_bedrockagentcore_gateway" "mcp" {
+  name        = "${var.project_name}-gateway"
+  description = "AgentCore Gateway for MCP Server"
+  role_arn    = aws_iam_role.gateway.arn
+
+  authorizer_type = "AWS_IAM"
+  protocol_type   = "MCP"
+
+  protocol_configuration {
+    mcp {
+      instructions       = "Gateway for MCP server running on ECS"
+      search_type        = "HYBRID"
+      supported_versions = ["2025-03-26"]
+    }
+  }
+
+  tags = var.tags
+}
+
+# AgentCore Gateway Target (MCP Server on ALB)
+resource "aws_bedrockagentcore_gateway_target" "mcp_server" {
+  gateway_identifier = aws_bedrockagentcore_gateway.mcp.gateway_id
+  name               = "${var.project_name}-mcp-server"
+  description        = "MCP Server running on ECS Fargate"
+
+  target_configuration {
+    mcp {
+      endpoint = "http://${module.alb.alb_dns_name}"
+    }
+  }
+
+  tags = var.tags
+
+  depends_on = [module.alb, module.ecs]
 }
 
 # ALB
