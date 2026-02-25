@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v0.5.0...v0.6.0) (2026-02-25)
+
+
+### Features
+
+* add API Gateway multi-service example with smart deployment scripts ([fe05d18](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/fe05d18cb97aec2309ce80afeeb77fbb614b3ad0))
+* upgrade to AWS Provider v6.0 and implement AgentCore Gateway ([3aa1177](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/3aa11773f6f95bb392d59b14ea2ef614cb692267))
+
 ## [0.5.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v0.4.0...v0.5.0) (2026-02-25)
 
 
