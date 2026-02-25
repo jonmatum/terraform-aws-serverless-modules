@@ -2,20 +2,41 @@
 
 Simple FastAPI application deployed to ECS with ALB.
 
-## Deployment Steps
+## Quick Start
 
-### 1. Create Infrastructure (ECR only)
+### Full Deployment
 
 ```bash
 cd examples/ecs-app
-terraform init
-terraform apply -target=module.ecr
+./deploy.sh
 ```
 
-### 2. Build and Push Docker Image
+This script will:
+1. Initialize Terraform
+2. Create all infrastructure (VPC, ALB, ECR, ECS)
+3. Build and push Docker image to ECR
+4. Deploy the ECS service
+5. Output the application URL
+
+### Manual Deployment
+
+#### 1. Create Infrastructure
 
 ```bash
-# Get ECR repository URL from output
+terraform init
+terraform apply
+```
+
+#### 2. Build and Push Docker Image
+
+```bash
+./build-and-push.sh
+```
+
+Or manually:
+
+```bash
+# Get ECR repository URL
 ECR_URL=$(terraform output -raw ecr_repository_url)
 
 # Login to ECR
@@ -26,20 +47,25 @@ docker build -t $ECR_URL:latest .
 docker push $ECR_URL:latest
 ```
 
-### 3. Deploy ECS Service
+#### 3. Force ECS Service Update
 
 ```bash
-terraform apply
+CLUSTER=$(terraform output -raw ecs_cluster_name)
+SERVICE=$(terraform output -raw ecs_service_name)
+aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment
 ```
 
-### 4. Access Application
+## Testing
 
 ```bash
-# Get ALB DNS name
-terraform output alb_dns_name
+# Get application URL
+ALB_URL=$(terraform output -raw alb_dns_name)
 
-# Test
-curl http://$(terraform output -raw alb_dns_name)
+# Test root endpoint
+curl http://$ALB_URL
+
+# Test health endpoint
+curl http://$ALB_URL/health
 ```
 
 ## Redeployment
@@ -47,7 +73,6 @@ curl http://$(terraform output -raw alb_dns_name)
 After making code changes:
 
 ```bash
-# From project root
 ./redeploy.sh
 
 # Or with specific tag
