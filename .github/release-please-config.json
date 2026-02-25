@@ -1,5 +1,12 @@
 {
   "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "aws-ecs-terraform-modules",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": false,
+      "extra-files": []
+    },
     "modules/alb": {
       "release-type": "terraform-module",
       "package-name": "terraform-aws-ecs-alb",
