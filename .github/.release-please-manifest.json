@@ -1,13 +1,13 @@
 {
   ".": "2.0.1",
-  "modules/alb": "0.3.0",
-  "modules/api-gateway": "0.4.0",
-  "modules/api-gateway-v1": "0.4.0",
-  "modules/ecr": "0.3.0",
-  "modules/ecs": "0.3.0",
-  "modules/vpc": "0.3.0",
-  "modules/cloudwatch-alarms": "0.3.0",
-  "modules/waf": "0.3.0",
-  "modules/cloudfront-s3": "0.3.0",
-  "modules/dynamodb": "0.3.0"
+  "modules/alb": "0.4.0",
+  "modules/api-gateway": "0.5.0",
+  "modules/api-gateway-v1": "0.5.0",
+  "modules/ecr": "0.4.0",
+  "modules/ecs": "0.4.0",
+  "modules/vpc": "0.4.0",
+  "modules/cloudwatch-alarms": "0.4.0",
+  "modules/waf": "0.4.0",
+  "modules/cloudfront-s3": "0.4.0",
+  "modules/dynamodb": "0.4.0"
 }
