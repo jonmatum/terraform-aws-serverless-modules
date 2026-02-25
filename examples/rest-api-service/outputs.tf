@@ -36,3 +36,8 @@ output "test_commands" {
     curl ${aws_api_gateway_stage.prod.invoke_url}/api/info
   EOT
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = module.ecs.cluster_name
+}

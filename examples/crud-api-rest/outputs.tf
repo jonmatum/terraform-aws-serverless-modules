@@ -57,3 +57,8 @@ output "test_commands" {
     open ${module.api_gateway_rest.api_endpoint}/docs
   EOT
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = module.ecs.cluster_name
+}

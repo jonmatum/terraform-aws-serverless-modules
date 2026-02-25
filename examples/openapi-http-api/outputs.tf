@@ -46,3 +46,8 @@ output "test_commands" {
     echo "OpenAPI spec: ${path.module}/openapi.json"
   EOT
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = module.ecs.cluster_name
+}

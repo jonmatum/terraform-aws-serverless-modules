@@ -33,3 +33,13 @@ output "test_commands" {
     curl ${module.api_gateway.api_endpoint}/api/mcp
   EOT
 }
+
+output "ecs_fastapi_cluster_name" {
+  description = "FastAPI ECS cluster name"
+  value       = module.ecs_fastapi.cluster_name
+}
+
+output "ecs_mcp_cluster_name" {
+  description = "MCP ECS cluster name"
+  value       = module.ecs_mcp.cluster_name
+}

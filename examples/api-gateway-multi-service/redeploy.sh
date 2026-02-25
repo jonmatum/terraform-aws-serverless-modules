@@ -16,7 +16,7 @@ echo "Service: $SERVICE"
 # Get ECR URLs and cluster info
 FASTAPI_ECR_URL=$(terraform output -raw fastapi_ecr_url)
 MCP_ECR_URL=$(terraform output -raw mcp_ecr_url)
-CLUSTER_NAME=$(terraform output -json | jq -r '.ecs_fastapi_cluster_id.value' | cut -d'/' -f2)
+CLUSTER_NAME=$(terraform output -raw ecs_fastapi_cluster_name)
 
 # Login to ECR
 echo ""
