@@ -1,0 +1,8 @@
+{
+  "modules/alb": "0.1.0",
+  "modules/api-gateway": "0.1.0",
+  "modules/api-gateway-v1": "0.1.0",
+  "modules/ecr": "0.1.0",
+  "modules/ecs": "0.1.0",
+  "modules/vpc": "0.1.0"
+}
