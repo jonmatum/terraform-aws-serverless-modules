@@ -116,7 +116,7 @@ enable_vpc_endpoints = true
 ```hcl
 module "ecs" {
   source = "./modules/ecs"
-  
+
   secrets = [{
     name      = "DATABASE_PASSWORD"
     valueFrom = "arn:aws:secretsmanager:..."
