@@ -38,6 +38,19 @@ module "ecr_fastapi" {
   tags            = var.tags
 }
 
+module "alb_fastapi" {
+  source = "../../modules/alb"
+
+  name              = "${var.project_name}-fastapi-alb"
+  internal          = true
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_subnet_ids
+  target_port       = 8000
+  health_check_path = "/"
+
+  tags = var.tags
+}
+
 module "ecs_fastapi" {
   source = "../../modules/ecs"
 
@@ -53,6 +66,7 @@ module "ecs_fastapi" {
   assign_public_ip   = false
   log_group_name     = aws_cloudwatch_log_group.fastapi.name
   aws_region         = var.aws_region
+  target_group_arn   = module.alb_fastapi.target_group_arn
 
   tags = var.tags
 }
@@ -63,6 +77,19 @@ module "ecr_mcp" {
 
   repository_name = "${var.project_name}-mcp"
   tags            = var.tags
+}
+
+module "alb_mcp" {
+  source = "../../modules/alb"
+
+  name              = "${var.project_name}-mcp-alb"
+  internal          = true
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_subnet_ids
+  target_port       = 3000
+  health_check_path = "/"
+
+  tags = var.tags
 }
 
 module "ecs_mcp" {
@@ -80,6 +107,7 @@ module "ecs_mcp" {
   assign_public_ip   = false
   log_group_name     = aws_cloudwatch_log_group.mcp.name
   aws_region         = var.aws_region
+  target_group_arn   = module.alb_mcp.target_group_arn
 
   tags = var.tags
 }
@@ -97,19 +125,19 @@ module "api_gateway" {
       method          = "ANY"
       route_key       = "ANY /api/fastapi/{proxy+}"
       connection_type = "VPC_LINK"
-      uri             = "http://${module.ecs_fastapi.service_name}.${var.project_name}.local:8000"
+      uri             = module.alb_fastapi.listener_arn
     }
     mcp = {
       method          = "ANY"
       route_key       = "ANY /api/mcp/{proxy+}"
       connection_type = "VPC_LINK"
-      uri             = "http://${module.ecs_mcp.service_name}.${var.project_name}.local:3000"
+      uri             = module.alb_mcp.listener_arn
     }
   }
 
   tags = var.tags
 
-  depends_on = [module.ecs_fastapi, module.ecs_mcp]
+  depends_on = [module.alb_fastapi, module.alb_mcp]
 }
 
 # CloudWatch Log Groups
@@ -182,6 +210,24 @@ resource "aws_iam_role_policy" "ecs_execution_custom" {
 }
 
 # Security Groups
+resource "aws_security_group_rule" "vpc_link_to_fastapi_alb" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.vpc_link.id
+  security_group_id        = module.alb_fastapi.alb_security_group_id
+}
+
+resource "aws_security_group_rule" "vpc_link_to_mcp_alb" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.vpc_link.id
+  security_group_id        = module.alb_mcp.alb_security_group_id
+}
+
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-ecs-tasks"
   description = "Security group for ECS tasks"
@@ -191,7 +237,7 @@ resource "aws_security_group" "ecs_tasks" {
     from_port       = 0
     to_port         = 65535
     protocol        = "tcp"
-    security_groups = [aws_security_group.vpc_link.id]
+    security_groups = [module.alb_fastapi.alb_security_group_id, module.alb_mcp.alb_security_group_id]
   }
 
   egress {

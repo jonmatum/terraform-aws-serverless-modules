@@ -30,6 +30,12 @@ variable "health_check_path" {
   default     = "/"
 }
 
+variable "listener_port" {
+  description = "Port for the listener"
+  type        = number
+  default     = 80
+}
+
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
