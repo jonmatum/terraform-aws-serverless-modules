@@ -47,6 +47,14 @@
       "include-component-in-tag": true,
       "tag-separator": "/",
       "extra-files": []
+    },
+    "modules/cloudwatch-alarms": {
+      "release-type": "terraform-module",
+      "package-name": "terraform-aws-cloudwatch-alarms",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true,
+      "tag-separator": "/",
+      "extra-files": []
     }
   },
   "bootstrap-sha": "f167624603af0e678701561fe0dbba7a06576f14"

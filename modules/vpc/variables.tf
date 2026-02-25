@@ -33,7 +33,13 @@ variable "enable_nat_gateway" {
 }
 
 variable "single_nat_gateway" {
-  description = "Use single NAT gateway for all private subnets"
+  description = "Use single NAT gateway for all private subnets (not recommended for production)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_vpc_endpoints" {
+  description = "Enable VPC endpoints for AWS services"
   type        = bool
   default     = true
 }

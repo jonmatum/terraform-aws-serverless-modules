@@ -98,6 +98,69 @@ variable "environment_variables" {
   default = []
 }
 
+variable "secrets" {
+  description = "Secrets from Secrets Manager or SSM Parameter Store"
+  type = list(object({
+    name      = string
+    valueFrom = string
+  }))
+  default = []
+}
+
+variable "enable_autoscaling" {
+  description = "Enable auto-scaling for the ECS service"
+  type        = bool
+  default     = true
+}
+
+variable "autoscaling_min_capacity" {
+  description = "Minimum number of tasks"
+  type        = number
+  default     = 1
+}
+
+variable "autoscaling_max_capacity" {
+  description = "Maximum number of tasks"
+  type        = number
+  default     = 4
+}
+
+variable "autoscaling_cpu_target" {
+  description = "Target CPU utilization percentage for auto-scaling"
+  type        = number
+  default     = 70
+}
+
+variable "autoscaling_memory_target" {
+  description = "Target memory utilization percentage for auto-scaling"
+  type        = number
+  default     = 80
+}
+
+variable "enable_container_insights" {
+  description = "Enable Container Insights for the ECS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "health_check_grace_period_seconds" {
+  description = "Health check grace period in seconds"
+  type        = number
+  default     = 60
+}
+
+variable "enable_fargate_spot" {
+  description = "Enable Fargate Spot capacity provider"
+  type        = bool
+  default     = false
+}
+
+variable "fargate_spot_weight" {
+  description = "Weight for Fargate Spot in capacity provider strategy (0-100)"
+  type        = number
+  default     = 50
+}
+
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
