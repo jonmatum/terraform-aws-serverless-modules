@@ -1,0 +1,202 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "${api_title}",
+    "description": "${api_description}",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/items": {
+      "get": {
+        "summary": "List all items",
+        "responses": {
+          "200": {
+            "description": "List of items"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/items",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new item",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "price", "quantity"],
+                "properties": {
+                  "name": {"type": "string"},
+                  "description": {"type": "string"},
+                  "price": {"type": "number"},
+                  "quantity": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item created"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "POST",
+          "uri": "http://${alb_dns}/items",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "201"
+            }
+          }
+        }
+      }
+    },
+    "/items/{id}": {
+      "get": {
+        "summary": "Get item by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item details"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/items/{id}",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "requestParameters": {
+            "integration.request.path.id": "method.request.path.id"
+          },
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {"type": "string"},
+                  "description": {"type": "string"},
+                  "price": {"type": "number"},
+                  "quantity": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item updated"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "PUT",
+          "uri": "http://${alb_dns}/items/{id}",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "requestParameters": {
+            "integration.request.path.id": "method.request.path.id"
+          },
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item deleted"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "DELETE",
+          "uri": "http://${alb_dns}/items/{id}",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "requestParameters": {
+            "integration.request.path.id": "method.request.path.id"
+          },
+          "responses": {
+            "default": {
+              "statusCode": "204"
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Service is healthy"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/health",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    }
+  }
+}
