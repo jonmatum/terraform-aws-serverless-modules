@@ -4,56 +4,6 @@
       "release-type": "simple",
       "changelog-path": "CHANGELOG.md",
       "extra-files": []
-    },
-    "modules/alb": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/api-gateway": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/api-gateway-v1": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/ecr": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/ecs": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/vpc": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/cloudwatch-alarms": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/waf": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/cloudfront-s3": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
-    },
-    "modules/dynamodb": {
-      "release-type": "terraform-module",
-      "changelog-path": "CHANGELOG.md",
-      "extra-files": []
     }
   },
   "bootstrap-sha": "56ec73ab487f8e3383aa6f88464d02eb44494764"
