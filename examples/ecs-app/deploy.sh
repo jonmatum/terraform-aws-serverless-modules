@@ -8,19 +8,14 @@ echo ""
 echo "1. Initializing Terraform..."
 terraform init
 
-# Step 2: Create ECR repository first
+# Step 2: Build and push Docker image (ECR repo should exist or will be created)
 echo ""
-echo "2. Creating ECR repository..."
-terraform apply -target=module.ecr -auto-approve
-
-# Step 3: Build and push Docker image
-echo ""
-echo "3. Building and pushing Docker image..."
+echo "2. Building and pushing Docker image..."
 ./build-and-push.sh
 
-# Step 4: Deploy remaining infrastructure
+# Step 3: Deploy all infrastructure
 echo ""
-echo "4. Deploying ECS infrastructure..."
+echo "3. Deploying infrastructure..."
 terraform apply -auto-approve
 
 echo ""
