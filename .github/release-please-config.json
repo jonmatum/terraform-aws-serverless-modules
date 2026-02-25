@@ -2,89 +2,57 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "aws-ecs-terraform-modules",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": false,
       "extra-files": []
     },
     "modules/alb": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-ecs-alb",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/api-gateway": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-api-gateway-http",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/api-gateway-v1": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-api-gateway-rest",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/ecr": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-ecr",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/ecs": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-ecs-fargate",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/vpc": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-vpc",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/cloudwatch-alarms": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-cloudwatch-alarms",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/waf": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-waf",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/cloudfront-s3": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-cloudfront-s3",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     },
     "modules/dynamodb": {
       "release-type": "terraform-module",
-      "package-name": "terraform-aws-dynamodb",
       "changelog-path": "CHANGELOG.md",
-      "include-component-in-tag": true,
-      "tag-separator": "/",
       "extra-files": []
     }
   },
