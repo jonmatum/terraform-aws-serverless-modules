@@ -3,6 +3,8 @@ set -e
 
 cd examples/ecs-app
 
+echo "=== ECS App Deployment ==="
+
 echo "Step 1: Creating ECR repository..."
 terraform apply -target=module.ecr -auto-approve
 
@@ -18,5 +20,7 @@ docker push $ECR_URL:latest
 echo "Step 3: Deploying ECS service..."
 terraform apply -auto-approve
 
-echo "Done! Access your app at:"
+echo ""
+echo "=== Deployment Complete ==="
+echo "Access your app at:"
 terraform output alb_dns_name

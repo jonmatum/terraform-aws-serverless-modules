@@ -13,6 +13,7 @@ ECR_URL=$(terraform output -raw ecr_repository_url)
 AWS_REGION=$(terraform output -raw aws_region)
 
 # Login to ECR
+echo "Logging into ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
 
 # Build and push
@@ -33,7 +34,10 @@ aws ecs update-service \
   --service $SERVICE_NAME \
   --force-new-deployment \
   --region $AWS_REGION \
-  --no-cli-pager
+  --no-cli-pager > /dev/null
 
-echo "Deployment initiated. New tasks will pull the updated image."
-echo "Monitor deployment: aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME --region $AWS_REGION"
+echo ""
+echo "=== Deployment Complete ==="
+echo "Image Tag: $IMAGE_TAG"
+echo "Monitor deployment:"
+echo "  aws ecs describe-services --cluster $CLUSTER_NAME --services $SERVICE_NAME --region $AWS_REGION"
