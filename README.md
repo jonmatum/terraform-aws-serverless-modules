@@ -68,6 +68,7 @@ terraform destroy -auto-approve
 | [ecs-app](./examples/ecs-app/) | Basic web app | ECS + ALB |
 | [api-gateway-multi-service](./examples/api-gateway-multi-service/) | Microservices | API Gateway + ECS + ALB |
 | [crud-api-rest](./examples/crud-api-rest/) | Full-stack CRUD | FastAPI + DynamoDB + React |
+| [mcp-agent-runtime](./examples/mcp-agent-runtime/) | MCP Server | Agent Gateway + ECS + MCP |
 | [rest-api-service](./examples/rest-api-service/) | Private API | REST API + VPC Link |
 | [openapi-http-api](./examples/openapi-http-api/) | Modern API | HTTP API + OpenAPI |
 | [openapi-rest-api](./examples/openapi-rest-api/) | Traditional API | REST API + Swagger |
