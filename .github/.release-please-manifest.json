@@ -6,5 +6,7 @@
   "modules/ecs": "0.1.0",
   "modules/vpc": "0.1.0",
   "modules/cloudwatch-alarms": "0.1.0",
-  "modules/waf": "0.1.0"
+  "modules/waf": "0.1.0",
+  "modules/cloudfront-s3": "0.1.0",
+  "modules/dynamodb": "0.1.0"
 }

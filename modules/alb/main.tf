@@ -27,8 +27,9 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 resource "aws_s3_bucket" "alb_logs" {
-  count  = var.enable_access_logs && var.access_logs_bucket == null ? 1 : 0
-  bucket = "${var.name}-alb-logs-${data.aws_caller_identity.current.account_id}"
+  count         = var.enable_access_logs && var.access_logs_bucket == null ? 1 : 0
+  bucket_prefix = "${var.name}-alb-logs-"
+  force_destroy = true
 
   tags = var.tags
 }

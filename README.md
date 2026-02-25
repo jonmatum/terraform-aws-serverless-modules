@@ -30,6 +30,15 @@ cd examples/api-gateway-multi-service
 ./deploy.sh
 ```
 
+### Test Idempotency
+
+```bash
+# Test full deploy/destroy cycle
+./test-idempotency.sh api-gateway-multi-service
+```
+
+All examples are **fully idempotent** - deploy and destroy multiple times without issues.
+
 ## 📚 Examples
 
 - **ecs-app** - Basic ECS application with ALB

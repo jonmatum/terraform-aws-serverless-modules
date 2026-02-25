@@ -63,6 +63,22 @@
       "include-component-in-tag": true,
       "tag-separator": "/",
       "extra-files": []
+    },
+    "modules/cloudfront-s3": {
+      "release-type": "terraform-module",
+      "package-name": "terraform-aws-cloudfront-s3",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true,
+      "tag-separator": "/",
+      "extra-files": []
+    },
+    "modules/dynamodb": {
+      "release-type": "terraform-module",
+      "package-name": "terraform-aws-dynamodb",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true,
+      "tag-separator": "/",
+      "extra-files": []
     }
   },
   "bootstrap-sha": "f167624603af0e678701561fe0dbba7a06576f14"
