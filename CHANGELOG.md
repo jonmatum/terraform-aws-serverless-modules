@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.0.0...v2.0.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* **ci:** simplify release-please config for Terraform Registry ([6ea403d](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/6ea403dba3810db902095dd817876fd12425a9c8))
+
 ## [2.0.0](https://github.com/jonmatum/aws-ecs-poc/compare/v1.0.0...v2.0.0) (2026-02-25)
 
 
