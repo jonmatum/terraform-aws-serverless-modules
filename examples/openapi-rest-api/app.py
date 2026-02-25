@@ -71,7 +71,7 @@ def update_product(product_id: int, product: ProductUpdate):
     """Update an existing product"""
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
-    
+
     stored_product = products_db[product_id]
     update_data = product.dict(exclude_unset=True)
     updated_product = stored_product.copy(update=update_data)

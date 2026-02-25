@@ -32,16 +32,16 @@ deploy_service() {
 
   echo ""
   echo "=== Deploying $service_name ==="
-  
+
   cd $service_dir
   echo "Building image..."
   docker build --platform linux/amd64 -t $ecr_url:$IMAGE_TAG -t $ecr_url:latest .
-  
+
   echo "Pushing image..."
   docker push $ecr_url:$IMAGE_TAG
   docker push $ecr_url:latest
   cd ..
-  
+
   echo "Forcing ECS service update..."
   aws ecs update-service \
     --cluster $CLUSTER_NAME \
@@ -49,7 +49,7 @@ deploy_service() {
     --force-new-deployment \
     --region $AWS_REGION \
     --no-cli-pager > /dev/null
-  
+
   echo "$service_name deployment initiated"
 }
 

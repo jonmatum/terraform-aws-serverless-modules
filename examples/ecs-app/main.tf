@@ -55,22 +55,22 @@ module "ecr" {
 module "ecs" {
   source = "../../modules/ecs"
 
-  cluster_name         = "${var.app_name}-cluster"
-  task_family          = var.app_name
-  service_name         = "${var.app_name}-service"
-  container_name       = var.app_name
-  container_image      = "${module.ecr.repository_url}:${var.image_tag}"
-  container_port       = var.container_port
-  cpu                  = var.cpu
-  memory               = var.memory
-  desired_count        = var.desired_count
-  execution_role_arn   = aws_iam_role.ecs_execution.arn
-  subnet_ids           = module.vpc.private_subnet_ids
-  security_group_ids   = [aws_security_group.ecs_tasks.id]
-  assign_public_ip     = false
-  target_group_arn     = module.alb.target_group_arn
-  log_group_name       = aws_cloudwatch_log_group.this.name
-  aws_region           = var.aws_region
+  cluster_name          = "${var.app_name}-cluster"
+  task_family           = var.app_name
+  service_name          = "${var.app_name}-service"
+  container_name        = var.app_name
+  container_image       = "${module.ecr.repository_url}:${var.image_tag}"
+  container_port        = var.container_port
+  cpu                   = var.cpu
+  memory                = var.memory
+  desired_count         = var.desired_count
+  execution_role_arn    = aws_iam_role.ecs_execution.arn
+  subnet_ids            = module.vpc.private_subnet_ids
+  security_group_ids    = [aws_security_group.ecs_tasks.id]
+  assign_public_ip      = false
+  target_group_arn      = module.alb.target_group_arn
+  log_group_name        = aws_cloudwatch_log_group.this.name
+  aws_region            = var.aws_region
   environment_variables = var.environment_variables
 
   tags = var.tags

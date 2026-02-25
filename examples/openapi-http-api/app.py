@@ -68,7 +68,7 @@ def update_user(user_id: int, user: UserUpdate):
     """Update an existing user"""
     if user_id not in users_db:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     stored_user = users_db[user_id]
     update_data = user.dict(exclude_unset=True)
     updated_user = stored_user.copy(update=update_data)

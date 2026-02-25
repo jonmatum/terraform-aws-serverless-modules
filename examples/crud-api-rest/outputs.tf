@@ -40,19 +40,19 @@ output "service_name" {
 
 output "test_commands" {
   description = "Commands to test the API"
-  value = <<-EOT
+  value       = <<-EOT
     # Test API
     export API_URL="${module.api_gateway_rest.api_endpoint}"
-    
+
     # Create item
     curl -X POST $API_URL/items -H "Content-Type: application/json" -d '{"name":"Test Item","description":"Test","price":29.99,"quantity":100}'
-    
+
     # List items
     curl $API_URL/items
-    
+
     # Health check
     curl $API_URL/health
-    
+
     # API Documentation
     open ${module.api_gateway_rest.api_endpoint}/docs
   EOT

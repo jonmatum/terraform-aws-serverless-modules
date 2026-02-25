@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 locals {
   use_openapi = var.openapi_spec != null
   use_nlb     = !local.use_openapi
@@ -224,4 +234,3 @@ resource "aws_api_gateway_account" "this" {
   count               = var.enable_access_logs ? 1 : 0
   cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch[0].arn
 }
-

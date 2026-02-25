@@ -56,10 +56,10 @@ module "ecr" {
 module "alb" {
   source = "../../modules/alb"
 
-  name       = "${var.project_name}-alb"
-  internal   = true
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnet_ids
+  name              = "${var.project_name}-alb"
+  internal          = true
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_subnet_ids
   target_port       = 8000
   health_check_path = "/health"
 
@@ -103,10 +103,9 @@ module "ecs" {
 module "api_gateway_rest" {
   source = "../../modules/api-gateway-v1"
 
-  name                        = "${var.project_name}-api"
-  vpc_link_subnet_ids         = module.vpc.private_subnet_ids
-  vpc_link_security_group_ids = [aws_security_group.vpc_link.id]
-  alb_listener_arn            = module.alb.listener_arn
+  name                = "${var.project_name}-api"
+  vpc_link_subnet_ids = module.vpc.private_subnet_ids
+  alb_listener_arn    = module.alb.listener_arn
 
   # OpenAPI/Swagger specification
   openapi_spec = templatefile("${path.module}/swagger.json", {
@@ -116,14 +115,12 @@ module "api_gateway_rest" {
     alb_dns         = module.alb.alb_dns_name
   })
 
-  enable_waf = var.enable_waf
-
   tags = var.tags
 
   depends_on = [module.alb]
 }
 
-# WAF (optional)
+# WAF (optional) - attach separately
 module "waf" {
   count  = var.enable_waf ? 1 : 0
   source = "../../modules/waf"
@@ -144,7 +141,7 @@ module "waf" {
 module "cloudfront" {
   source = "../../modules/cloudfront-s3"
 
-  name          = "${var.project_name}-web"
+  name           = "${var.project_name}-web"
   enable_logging = true
 
   tags = var.tags

@@ -8,12 +8,6 @@ variable "vpc_link_subnet_ids" {
   type        = list(string)
 }
 
-variable "vpc_link_security_group_ids" {
-  description = "Security group IDs for VPC Link (optional)"
-  type        = list(string)
-  default     = []
-}
-
 variable "alb_listener_arn" {
   description = "ARN of the ALB listener for VPC Link integration (optional, for OpenAPI mode)"
   type        = string

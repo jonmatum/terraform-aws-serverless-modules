@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 resource "aws_apigatewayv2_vpc_link" "this" {
   name               = "${var.name}-vpc-link"
   security_group_ids = var.vpc_link_security_group_ids
@@ -50,15 +60,15 @@ resource "aws_apigatewayv2_stage" "default" {
     content {
       destination_arn = aws_cloudwatch_log_group.api_gateway[0].arn
       format = jsonencode({
-        requestId      = "$context.requestId"
-        ip             = "$context.identity.sourceIp"
-        requestTime    = "$context.requestTime"
-        httpMethod     = "$context.httpMethod"
-        routeKey       = "$context.routeKey"
-        status         = "$context.status"
-        protocol       = "$context.protocol"
-        responseLength = "$context.responseLength"
-        errorMessage   = "$context.error.message"
+        requestId        = "$context.requestId"
+        ip               = "$context.identity.sourceIp"
+        requestTime      = "$context.requestTime"
+        httpMethod       = "$context.httpMethod"
+        routeKey         = "$context.routeKey"
+        status           = "$context.status"
+        protocol         = "$context.protocol"
+        responseLength   = "$context.responseLength"
+        errorMessage     = "$context.error.message"
         integrationError = "$context.integrationErrorMessage"
       })
     }

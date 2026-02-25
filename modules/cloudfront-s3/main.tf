@@ -1,5 +1,12 @@
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 # S3 bucket for website content
 resource "aws_s3_bucket" "website" {
@@ -181,12 +188,12 @@ resource "aws_cloudfront_function" "spa_routing" {
     function handler(event) {
       var request = event.request;
       var uri = request.uri;
-      
+
       // Check if URI has a file extension
       if (!uri.includes('.')) {
         request.uri = '/index.html';
       }
-      
+
       return request;
     }
   EOT

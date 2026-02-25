@@ -25,10 +25,10 @@ output "ecs_mcp_cluster_id" {
 
 output "test_commands" {
   description = "Commands to test the services"
-  value = <<-EOT
+  value       = <<-EOT
     # Test FastAPI service
     curl ${module.api_gateway.api_endpoint}/api/fastapi
-    
+
     # Test MCP service
     curl ${module.api_gateway.api_endpoint}/api/mcp
   EOT

@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 # ECS Service CPU Alarm
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
   count               = var.enable_alarms ? 1 : 0

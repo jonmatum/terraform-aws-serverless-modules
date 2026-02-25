@@ -5,6 +5,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -56,9 +64,9 @@ for path, methods in spec.get("paths", {}).items():
                 "x-amazon-apigateway-integration": {
                     "type": "http_proxy",
                     "httpMethod": method.upper(),
-                    "uri": f"http://${{stageVariables.nlb_dns}}{path}",
+                    "uri": "http://$${stageVariables.nlb_dns}" + path,
                     "connectionType": "VPC_LINK",
-                    "connectionId": "${{stageVariables.vpc_link_id}}",
+                    "connectionId": "$${stageVariables.vpc_link_id}",
                     "responses": {
                         "default": {
                             "statusCode": "200"
@@ -210,8 +218,8 @@ resource "aws_api_gateway_stage" "prod" {
   stage_name    = "prod"
 
   variables = {
-    nlb_dns      = aws_lb.nlb.dns_name
-    vpc_link_id  = aws_api_gateway_vpc_link.this.id
+    nlb_dns     = aws_lb.nlb.dns_name
+    vpc_link_id = aws_api_gateway_vpc_link.this.id
   }
 
   tags = var.tags

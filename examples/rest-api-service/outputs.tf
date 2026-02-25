@@ -25,13 +25,13 @@ output "nlb_dns_name" {
 
 output "test_commands" {
   description = "Commands to test the service"
-  value = <<-EOT
+  value       = <<-EOT
     # Test the service
     curl ${aws_api_gateway_stage.prod.invoke_url}/api/hello
-    
+
     # Test health check
     curl ${aws_api_gateway_stage.prod.invoke_url}/api/health
-    
+
     # Test info endpoint
     curl ${aws_api_gateway_stage.prod.invoke_url}/api/info
   EOT

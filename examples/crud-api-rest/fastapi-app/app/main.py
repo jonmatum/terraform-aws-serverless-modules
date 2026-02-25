@@ -88,14 +88,14 @@ async def create_item(item: ItemCreate):
     try:
         item_id = str(uuid.uuid4())
         timestamp = datetime.utcnow().isoformat() + "Z"
-        
+
         item_data = {
             "id": item_id,
             **item.model_dump(),
             "created_at": timestamp,
             "updated_at": timestamp
         }
-        
+
         table.put_item(Item=item_data)
         return Item(**item_data)
     except Exception as e:
@@ -110,13 +110,13 @@ async def list_items(limit: int = 100, last_key: Optional[str] = None):
     """List all items with pagination"""
     try:
         scan_kwargs = {"Limit": min(limit, 100)}
-        
+
         if last_key:
             scan_kwargs["ExclusiveStartKey"] = {"id": last_key}
-        
+
         response = table.scan(**scan_kwargs)
         items = [Item(**item) for item in response.get('Items', [])]
-        
+
         return items
     except Exception as e:
         raise HTTPException(
@@ -130,13 +130,13 @@ async def get_item(item_id: str):
     """Get a specific item by ID"""
     try:
         response = table.get_item(Key={"id": item_id})
-        
+
         if 'Item' not in response:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Item with id {item_id} not found"
             )
-        
+
         return Item(**response['Item'])
     except HTTPException:
         raise
@@ -158,18 +158,18 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Item with id {item_id} not found"
             )
-        
+
         # Build update expression
         update_data = {k: v for k, v in item_update.model_dump().items() if v is not None}
         if not update_data:
             return Item(**response['Item'])
-        
+
         update_data["updated_at"] = datetime.utcnow().isoformat() + "Z"
-        
+
         update_expression = "SET " + ", ".join([f"#{k} = :{k}" for k in update_data.keys()])
         expression_attribute_names = {f"#{k}": k for k in update_data.keys()}
         expression_attribute_values = {f":{k}": v for k, v in update_data.items()}
-        
+
         response = table.update_item(
             Key={"id": item_id},
             UpdateExpression=update_expression,
@@ -177,7 +177,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
             ExpressionAttributeValues=expression_attribute_values,
             ReturnValues="ALL_NEW"
         )
-        
+
         return Item(**response['Attributes'])
     except HTTPException:
         raise
@@ -199,7 +199,7 @@ async def delete_item(item_id: str):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Item with id {item_id} not found"
             )
-        
+
         table.delete_item(Key={"id": item_id})
         return None
     except HTTPException:

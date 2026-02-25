@@ -20,28 +20,28 @@ output "openapi_spec_location" {
 
 output "test_commands" {
   description = "Commands to test the API"
-  value = <<-EOT
+  value       = <<-EOT
     API_ENDPOINT=${aws_apigatewayv2_api.this.api_endpoint}
-    
+
     # List all users
     curl $API_ENDPOINT/users
-    
+
     # Get specific user
     curl $API_ENDPOINT/users/1
-    
+
     # Create user
     curl -X POST $API_ENDPOINT/users \
       -H "Content-Type: application/json" \
       -d '{"name":"Alice","email":"alice@example.com"}'
-    
+
     # Update user
     curl -X PUT $API_ENDPOINT/users/1 \
       -H "Content-Type: application/json" \
       -d '{"name":"John Updated"}'
-    
+
     # Delete user
     curl -X DELETE $API_ENDPOINT/users/2
-    
+
     # View OpenAPI docs
     echo "OpenAPI spec: ${path.module}/openapi.json"
   EOT

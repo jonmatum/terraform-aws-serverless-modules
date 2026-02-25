@@ -1,6 +1,6 @@
 output "api_endpoint" {
   description = "API Gateway endpoint URL"
-  value       = "${aws_api_gateway_stage.prod.invoke_url}"
+  value       = aws_api_gateway_stage.prod.invoke_url
 }
 
 output "api_id" {
@@ -20,28 +20,28 @@ output "openapi_spec_location" {
 
 output "test_commands" {
   description = "Commands to test the API"
-  value = <<-EOT
+  value       = <<-EOT
     API_ENDPOINT=${aws_api_gateway_stage.prod.invoke_url}
-    
+
     # List all products
     curl $API_ENDPOINT/products
-    
+
     # Get specific product
     curl $API_ENDPOINT/products/1
-    
+
     # Create product
     curl -X POST $API_ENDPOINT/products \
       -H "Content-Type: application/json" \
       -d '{"name":"Laptop","price":999.99,"stock":10}'
-    
+
     # Update product
     curl -X PUT $API_ENDPOINT/products/1 \
       -H "Content-Type: application/json" \
       -d '{"price":899.99}'
-    
+
     # Delete product
     curl -X DELETE $API_ENDPOINT/products/2
-    
+
     # View OpenAPI docs
     echo "OpenAPI spec: ${path.module}/openapi.json"
   EOT

@@ -117,14 +117,14 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 ```hcl
 module "vpc" {
   source = "../../modules/vpc"
-  
+
   name               = "prod-vpc"
   cidr               = "10.0.0.0/16"
   azs                = ["us-east-1a", "us-east-1b", "us-east-1c"]
   enable_nat_gateway = true
   single_nat_gateway = false  # Multi-AZ for HA
   enable_vpc_endpoints = true
-  
+
   tags = {
     Environment = "production"
     Project     = "my-app"
@@ -134,42 +134,42 @@ module "vpc" {
 
 module "ecs" {
   source = "../../modules/ecs"
-  
+
   # ... other config ...
-  
+
   enable_autoscaling        = true
   autoscaling_min_capacity  = 2
   autoscaling_max_capacity  = 10
   autoscaling_cpu_target    = 70
   autoscaling_memory_target = 80
   enable_container_insights = true
-  
+
   tags = var.tags
 }
 
 module "alb" {
   source = "../../modules/alb"
-  
+
   # ... other config ...
-  
+
   enable_access_logs       = true
   deregistration_delay     = 30
   enable_https             = true
   certificate_arn          = "arn:aws:acm:..."
   redirect_http_to_https   = true
-  
+
   tags = var.tags
 }
 
 module "ecr" {
   source = "../../modules/ecr"
-  
+
   repository_name         = "my-app"
   encryption_type         = "KMS"
   kms_key_arn            = "arn:aws:kms:..."
   enable_lifecycle_policy = true
   scan_on_push           = true
-  
+
   tags = var.tags
 }
 ```
@@ -179,11 +179,11 @@ module "ecr" {
 ```hcl
 module "vpc" {
   source = "../../modules/vpc"
-  
+
   name               = "dev-vpc"
   single_nat_gateway = true  # Single NAT for cost savings
   enable_vpc_endpoints = true  # Still use VPC endpoints
-  
+
   tags = {
     Environment = "dev"
     ManagedBy   = "terraform"
@@ -192,14 +192,14 @@ module "vpc" {
 
 module "ecs" {
   source = "../../modules/ecs"
-  
+
   # ... other config ...
-  
+
   enable_fargate_spot    = true
   fargate_spot_weight    = 70  # 70% Spot, 30% On-Demand
   autoscaling_min_capacity = 1
   autoscaling_max_capacity = 4
-  
+
   tags = var.tags
 }
 ```
@@ -209,16 +209,16 @@ module "ecs" {
 ```hcl
 module "ecs" {
   source = "../../modules/ecs"
-  
+
   # ... other config ...
-  
+
   environment_variables = [
     {
       name  = "APP_ENV"
       value = "production"
     }
   ]
-  
+
   secrets = [
     {
       name      = "DATABASE_PASSWORD"

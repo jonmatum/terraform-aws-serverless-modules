@@ -1,7 +1,3 @@
-locals {
-  use_openapi = var.openapi_spec != null
-}
-
 output "api_id" {
   description = "API Gateway REST API ID"
   value       = local.use_openapi ? aws_api_gateway_rest_api.openapi[0].id : aws_api_gateway_rest_api.legacy[0].id
