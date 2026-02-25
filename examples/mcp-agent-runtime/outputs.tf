@@ -1,6 +1,11 @@
-output "api_endpoint" {
-  description = "Agent Gateway API endpoint"
-  value       = module.api_gateway.api_endpoint
+output "gateway_url" {
+  description = "AgentCore Gateway URL"
+  value       = aws_bedrockagentcore_gateway.mcp.gateway_url
+}
+
+output "gateway_id" {
+  description = "AgentCore Gateway ID"
+  value       = aws_bedrockagentcore_gateway.mcp.gateway_id
 }
 
 output "alb_dns_name" {
@@ -26,20 +31,16 @@ output "ecs_service_name" {
 output "test_commands" {
   description = "Commands to test the MCP server"
   value       = <<-EOT
-    # Health check
-    curl ${module.api_gateway.api_endpoint}/health
+    # Get Gateway URL
+    GATEWAY_URL=$(terraform output -raw gateway_url)
 
-    # List available tools
-    curl -X POST ${module.api_gateway.api_endpoint}/mcp/tools/list
+    # Test via AWS CLI (requires AWS IAM authentication)
+    aws bedrock-agentcore-runtime invoke-gateway \
+      --gateway-identifier $(terraform output -raw gateway_id) \
+      --request-body '{"method":"tools/list"}' \
+      --region ${var.aws_region}
 
-    # Call echo tool
-    curl -X POST ${module.api_gateway.api_endpoint}/mcp/tools/call \
-      -H "Content-Type: application/json" \
-      -d '{"name": "echo", "arguments": {"message": "Hello from MCP!"}}'
-
-    # Get system info
-    curl -X POST ${module.api_gateway.api_endpoint}/mcp/tools/call \
-      -H "Content-Type: application/json" \
-      -d '{"name": "get_system_info", "arguments": {}}'
+    # Direct ALB access (for debugging)
+    curl http://${module.alb.alb_dns_name}/health
   EOT
 }

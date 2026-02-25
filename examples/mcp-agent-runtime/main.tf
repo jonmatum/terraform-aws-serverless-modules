@@ -219,7 +219,7 @@ resource "aws_bedrockagentcore_gateway" "mcp" {
   protocol_configuration {
     mcp {
       instructions       = "Gateway for MCP server running on ECS"
-      search_type        = "HYBRID"
+      search_type        = "SEMANTIC"
       supported_versions = ["2025-03-26"]
     }
   }
@@ -235,11 +235,11 @@ resource "aws_bedrockagentcore_gateway_target" "mcp_server" {
 
   target_configuration {
     mcp {
-      endpoint = "http://${module.alb.alb_dns_name}"
+      mcp_server {
+        endpoint = "http://${module.alb.alb_dns_name}"
+      }
     }
   }
-
-  tags = var.tags
 
   depends_on = [module.alb, module.ecs]
 }
@@ -303,46 +303,6 @@ module "ecs" {
   fargate_spot_weight = 50
 
   tags = var.tags
-}
-
-# API Gateway (Agent Gateway)
-module "api_gateway" {
-  source = "../../modules/api-gateway"
-
-  name                        = "${var.project_name}-agent-gateway"
-  vpc_link_subnet_ids         = module.vpc.private_subnet_ids
-  vpc_link_security_group_ids = [aws_security_group.vpc_link.id]
-
-  integrations = {
-    health = {
-      method          = "GET"
-      route_key       = "GET /health"
-      connection_type = "VPC_LINK"
-      uri             = module.alb.listener_arn
-    }
-    tools_list = {
-      method          = "POST"
-      route_key       = "POST /mcp/tools/list"
-      connection_type = "VPC_LINK"
-      uri             = module.alb.listener_arn
-    }
-    tools_call = {
-      method          = "POST"
-      route_key       = "POST /mcp/tools/call"
-      connection_type = "VPC_LINK"
-      uri             = module.alb.listener_arn
-    }
-  }
-
-  enable_access_logs   = true
-  enable_xray_tracing  = true
-  enable_throttling    = true
-  throttle_burst_limit = 100
-  throttle_rate_limit  = 50
-
-  tags = var.tags
-
-  depends_on = [module.alb]
 }
 
 # CloudWatch Alarms

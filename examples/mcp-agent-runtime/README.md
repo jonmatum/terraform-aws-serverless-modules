@@ -1,28 +1,30 @@
 # MCP Agent Runtime Example
 
-Model Context Protocol (MCP) server running on ECS Fargate, exposed via Agent Gateway (API Gateway).
+**⚠️ REQUIRES: AWS Provider >= 6.18.0** (for `aws_bedrockagentcore_gateway` resources)
+
+Model Context Protocol (MCP) server running on ECS Fargate, exposed via **Amazon Bedrock AgentCore Gateway**.
 
 ## Architecture
 
 ```
-┌─────────────────┐
-│  Agent Gateway  │ (API Gateway HTTP API)
-│   (Public)      │
-└────────┬────────┘
-         │ VPC Link
-         ▼
-┌─────────────────┐
-│      ALB        │ (Application Load Balancer)
-│   (Private)     │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│   ECS Fargate   │ (MCP Server Container)
-│   (Private)     │
-│   - Auto-scale  │
-│   - Spot 50%    │
-└─────────────────┘
+┌──────────────────────┐
+│  AgentCore Gateway   │ (AWS Bedrock AgentCore)
+│   MCP Protocol       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│        ALB           │ (Application Load Balancer)
+│     (Internal)       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│    ECS Fargate       │ (MCP Server Container)
+│    (Private)         │
+│    - Auto-scale      │
+│    - Spot 50%        │
+└──────────────────────┘
 ```
 
 ## Components
@@ -30,7 +32,7 @@ Model Context Protocol (MCP) server running on ECS Fargate, exposed via Agent Ga
 - **MCP Server**: Node.js application implementing Model Context Protocol
 - **ECS Fargate**: Serverless container runtime with auto-scaling
 - **ALB**: Load balancer for health checks and traffic distribution
-- **Agent Gateway**: API Gateway HTTP API with VPC Link
+- **AgentCore Gateway**: AWS-native MCP gateway with IAM authentication
 - **CloudWatch**: Logs, metrics, and alarms
 - **ECR**: Container registry with lifecycle policies
 
@@ -76,24 +78,24 @@ IMAGE_TAG=v1.0.0 ./deploy.sh
 After deployment, test the MCP server:
 
 ```bash
-# Get API endpoint
-API_ENDPOINT=$(terraform output -raw api_endpoint)
+# Get Gateway URL
+GATEWAY_URL=$(terraform output -raw gateway_url)
+GATEWAY_ID=$(terraform output -raw gateway_id)
 
-# Health check
-curl $API_ENDPOINT/health
+# Test via AWS CLI (requires AWS IAM authentication)
+aws bedrock-agentcore-runtime invoke-gateway \
+  --gateway-identifier $GATEWAY_ID \
+  --request-body '{"method":"tools/list"}' \
+  --region us-east-1
 
-# List available tools
-curl -X POST $API_ENDPOINT/mcp/tools/list
+# Call a tool
+aws bedrock-agentcore-runtime invoke-gateway \
+  --gateway-identifier $GATEWAY_ID \
+  --request-body '{"method":"tools/call","params":{"name":"echo","arguments":{"message":"Hello MCP!"}}}' \
+  --region us-east-1
 
-# Call echo tool
-curl -X POST $API_ENDPOINT/mcp/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{"name": "echo", "arguments": {"message": "Hello from MCP!"}}'
-
-# Get system info
-curl -X POST $API_ENDPOINT/mcp/tools/call \
-  -H "Content-Type: application/json" \
-  -d '{"name": "get_system_info", "arguments": {}}'
+# Direct ALB access (for debugging)
+curl http://$(terraform output -raw alb_dns_name)/health
 ```
 
 ## MCP Server Development
