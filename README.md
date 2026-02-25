@@ -1,18 +1,45 @@
-# AWS ECS Terraform Modules
+# AWS Serverless Terraform Modules
 
-Production-ready, Well-Architected Terraform modules for deploying containerized applications on AWS ECS.
+[![Terraform Registry](https://img.shields.io/badge/Terraform-Registry-623CE4?logo=terraform)](https://registry.terraform.io/modules/jonmatum/serverless-modules/aws)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Educational Purpose](https://img.shields.io/badge/Purpose-Educational-yellow.svg)](https://github.com/jonmatum/terraform-aws-serverless-modules)
 
-## 🏗️ Architecture
+> **Note**: These modules are created for educational purposes to demonstrate AWS serverless architecture patterns and Terraform best practices. While following production-ready patterns, please review and test thoroughly before using in production environments.
+
+Terraform modules for deploying serverless and container-based applications on AWS, following AWS Well-Architected Framework best practices.
+
+## Architecture
 
 Built following [AWS Well-Architected Framework](./WELL_ARCHITECTED.md) best practices:
 
-- ✅ **Security**: Encryption, least-privilege IAM, VPC endpoints, WAF
-- ✅ **Reliability**: Multi-AZ, auto-scaling, health checks, monitoring
-- ✅ **Operational Excellence**: Container Insights, access logs, alarms
-- ✅ **Performance**: Fargate, VPC endpoints, CloudFront CDN
-- ✅ **Cost Optimization**: Fargate Spot, lifecycle policies, VPC endpoints
+- Security: Encryption, least-privilege IAM, VPC endpoints, WAF
+- Reliability: Multi-AZ, auto-scaling, health checks, monitoring
+- Operational Excellence: Container Insights, access logs, alarms
+- Performance: Fargate, VPC endpoints, CloudFront CDN
+- Cost Optimization: Fargate Spot, lifecycle policies, VPC endpoints
 
-## 📦 Modules
+## Usage from Terraform Registry
+
+```hcl
+module "vpc" {
+  source  = "jonmatum/serverless-modules/aws//modules/vpc"
+  version = "2.0.1"
+  
+  project_name = "my-app"
+  cidr_block   = "10.0.0.0/16"
+}
+
+module "ecs" {
+  source  = "jonmatum/serverless-modules/aws//modules/ecs"
+  version = "2.0.1"
+  
+  cluster_name = "my-cluster"
+  vpc_id       = module.vpc.vpc_id
+  # ...
+}
+```
+
+## Modules
 
 | Module | Description | Key Features |
 |--------|-------------|--------------|
@@ -27,7 +54,7 @@ Built following [AWS Well-Architected Framework](./WELL_ARCHITECTED.md) best pra
 | **waf** | Web Application Firewall | Rate limiting, IP filtering |
 | **cloudwatch-alarms** | Monitoring | CPU, memory, response time |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Choose an Example
 
@@ -61,7 +88,7 @@ curl $(terraform output -raw api_endpoint)/health
 terraform destroy -auto-approve
 ```
 
-## 📚 Examples
+##  Examples
 
 | Example | Description | Components |
 |---------|-------------|------------|
@@ -73,7 +100,7 @@ terraform destroy -auto-approve
 | [openapi-http-api](./examples/openapi-http-api/) | Modern API | HTTP API + OpenAPI |
 | [openapi-rest-api](./examples/openapi-rest-api/) | Traditional API | REST API + Swagger |
 
-## 🔧 Key Features
+##  Key Features
 
 ### Idempotent Deployments
 ```bash
@@ -105,14 +132,14 @@ enable_vpc_endpoints = true
 - VPC endpoints
 - WAF protection
 
-## 📊 Cost Estimates
+##  Cost Estimates
 
 | Environment | Monthly Cost | Key Resources |
 |-------------|--------------|---------------|
 | **Development** | $70-90 | Single NAT, Fargate Spot |
 | **Production** | $200-400 | Multi-AZ NAT, Auto-scaling |
 
-## 🔐 Secrets Management
+##  Secrets Management
 
 ```hcl
 module "ecs" {
@@ -125,7 +152,7 @@ module "ecs" {
 }
 ```
 
-## 📈 Monitoring
+##  Monitoring
 
 Built-in CloudWatch alarms:
 - CPU/Memory utilization
@@ -133,7 +160,7 @@ Built-in CloudWatch alarms:
 - Unhealthy targets
 - 5XX errors
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Test all modules
@@ -143,19 +170,19 @@ Built-in CloudWatch alarms:
 ./test-idempotency.sh api-gateway-multi-service
 ```
 
-## 📖 Documentation
+##  Documentation
 
 - [WELL_ARCHITECTED.md](./WELL_ARCHITECTED.md) - Architecture details
 - [modules/*/README.md](./modules/) - Module documentation
 - [examples/*/README.md](./examples/) - Example guides
 
-## 🤝 Contributing
+##  Contributing
 
 ```bash
 pre-commit run --all-files
 ./test-modules.sh
 ```
 
-## 📄 License
+##  License
 
 MIT
