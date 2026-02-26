@@ -1,17 +1,19 @@
 #!/bin/bash
 set -e
 
-# Get AWS account ID and region
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=${AWS_REGION:-us-east-1}
-APP_NAME=${APP_NAME:-ecs-app}
+# Get ECR URL from Terraform output
+ECR_REPO=$(terraform output -raw ecr_repository_url 2>/dev/null)
+if [ -z "$ECR_REPO" ]; then
+  echo "❌ Error: ECR repository not found. Run 'terraform apply' first."
+  exit 1
+fi
+
+AWS_REGION=$(terraform output -raw aws_region 2>/dev/null || echo "us-east-1")
 IMAGE_TAG=${IMAGE_TAG:-latest}
+APP_NAME=$(basename "$ECR_REPO")
 
-# ECR repository URL
-ECR_REPO="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}"
-
-echo "Building Docker image..."
-docker build -t ${APP_NAME}:${IMAGE_TAG} .
+echo "Building Docker image for linux/amd64..."
+docker build --platform linux/amd64 -t ${APP_NAME}:${IMAGE_TAG} .
 
 echo "Tagging image for ECR..."
 docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}

@@ -4,6 +4,8 @@ set -e
 echo "🚀 Deploying CRUD API (REST API with Swagger)"
 echo "=============================================="
 
+AWS_REGION=${AWS_REGION:-us-east-1}
+
 # Check if AWS CLI is installed
 if ! command -v aws &> /dev/null; then
     echo "❌ AWS CLI is not installed"
@@ -20,13 +22,12 @@ fi
 echo "📦 Initializing Terraform..."
 terraform init
 
-# Apply infrastructure (without Docker image first)
-echo "🏗️  Creating infrastructure..."
-terraform apply -auto-approve
+# Create ECR repository first
+echo "🏗️  Creating ECR repository..."
+terraform apply -target=module.ecr -auto-approve
 
 # Get ECR repository URL
 ECR_REPO=$(terraform output -raw ecr_repository_url)
-AWS_REGION=$(terraform output -json | jq -r '.aws_region.value // "us-east-1"')
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 # Build and push Docker image
@@ -36,14 +37,18 @@ cd fastapi-app
 # Login to ECR
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-# Build image
-docker build -t crud-api-rest:latest .
+# Build image for linux/amd64
+docker build --platform linux/amd64 -t crud-api-rest:latest .
 
 # Tag and push
 docker tag crud-api-rest:latest $ECR_REPO:latest
 docker push $ECR_REPO:latest
 
 cd ..
+
+# Deploy remaining infrastructure
+echo "🏗️  Deploying infrastructure..."
+terraform apply -auto-approve
 
 # Force new ECS deployment
 echo "🔄 Forcing ECS service update..."

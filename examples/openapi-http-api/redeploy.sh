@@ -13,8 +13,8 @@ echo "Image Tag: $IMAGE_TAG"
 
 # Get ECR URL and cluster info
 ECR_URL=$(terraform output -raw ecr_repository_url)
-CLUSTER_NAME=$(terraform output -raw api_id | cut -d'/' -f1)
-SERVICE_NAME="${var.project_name:-openapi-http-api}-service"
+CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)
+SERVICE_NAME=$(terraform output -raw ecs_service_name)
 
 # Login to ECR
 echo ""
@@ -34,19 +34,21 @@ docker push $ECR_URL:latest
 echo ""
 echo "Regenerating OpenAPI spec..."
 pip3 install -q -r requirements.txt
-python3 -c "
-import json
-from app import app
-spec = app.openapi()
-with open('openapi.json', 'w') as f:
-    json.dump(spec, f, indent=2)
-print('OpenAPI spec updated')
-"
 
 # Apply terraform to update API Gateway if spec changed
 echo ""
 echo "Updating API Gateway with new spec..."
 terraform apply -auto-approve
+
+# Force ECS update
+echo ""
+echo "Forcing ECS service update..."
+aws ecs update-service \
+  --cluster $CLUSTER_NAME \
+  --service $SERVICE_NAME \
+  --force-new-deployment \
+  --region $AWS_REGION \
+  --no-cli-pager > /dev/null
 
 echo ""
 echo "=== Redeployment Complete ==="

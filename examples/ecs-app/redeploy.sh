@@ -21,10 +21,8 @@ export IMAGE_TAG
 # Also tag as latest
 echo ""
 echo "2. Updating 'latest' tag..."
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION=${AWS_REGION:-us-east-1}
-APP_NAME=${APP_NAME:-ecs-app}
-ECR_REPO="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_NAME}"
+ECR_REPO=$(terraform output -raw ecr_repository_url)
+APP_NAME=$(basename "$ECR_REPO")
 
 docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_REPO}:latest
 docker push ${ECR_REPO}:latest
@@ -34,7 +32,8 @@ echo ""
 echo "3. Forcing ECS service update..."
 CLUSTER=$(terraform output -raw ecs_cluster_name)
 SERVICE=$(terraform output -raw ecs_service_name)
-aws ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --force-new-deployment > /dev/null
+AWS_REGION=$(terraform output -raw aws_region)
+aws ecs update-service --region ${AWS_REGION} --cluster ${CLUSTER} --service ${SERVICE} --force-new-deployment > /dev/null
 
 echo ""
 echo "✅ Redeployment complete!"

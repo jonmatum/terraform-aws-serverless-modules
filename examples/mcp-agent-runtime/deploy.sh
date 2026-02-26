@@ -15,9 +15,9 @@ echo ""
 echo "Initializing Terraform..."
 terraform init
 
-# Apply infrastructure
-echo "Applying Terraform configuration..."
-terraform apply -auto-approve
+# Create ECR repository first
+echo "Creating ECR repository..."
+terraform apply -target=module.ecr -auto-approve
 
 # Get ECR repository URL
 ECR_URL=$(terraform output -raw ecr_repository_url)
@@ -29,13 +29,17 @@ aws ecr get-login-password --region $AWS_REGION | \
   docker login --username AWS --password-stdin $ECR_URL
 
 # Build and push Docker image
-echo "Building Docker image..."
+echo "Building Docker image for linux/amd64..."
 cd mcp-server
-docker build -t $ECR_URL:$IMAGE_TAG .
+docker build --platform linux/amd64 -t $ECR_URL:$IMAGE_TAG .
 
 echo "Pushing Docker image..."
 docker push $ECR_URL:$IMAGE_TAG
 cd ..
+
+# Apply remaining infrastructure
+echo "Deploying infrastructure..."
+terraform apply -auto-approve
 
 # Force new deployment
 echo "Forcing new ECS deployment..."
