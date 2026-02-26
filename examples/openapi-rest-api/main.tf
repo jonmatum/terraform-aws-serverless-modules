@@ -24,7 +24,7 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Generate OpenAPI spec from FastAPI and convert to Swagger 2.0
+# Generate OpenAPI spec from FastAPI using Docker and convert to Swagger 2.0
 resource "null_resource" "generate_openapi" {
   triggers = {
     app_hash = filemd5("${path.module}/app.py")
@@ -33,59 +33,79 @@ resource "null_resource" "generate_openapi" {
   provisioner "local-exec" {
     command = <<-EOT
       cd ${path.module}
-      python3 << 'PYTHON'
+      docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "
+        pip install -q fastapi uvicorn && \
+        python3 -c \"
 import json
 from app import app
 
-# Get OpenAPI 3.0 spec
 spec = app.openapi()
 
-# Convert to Swagger 2.0 format for REST API
+# Helper to convert schema references
+def convert_refs(obj):
+    if isinstance(obj, dict):
+        return {k: convert_refs(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_refs(item) for item in obj]
+    elif isinstance(obj, str) and '#/components/schemas/' in obj:
+        return obj.replace('#/components/schemas/', '#/definitions/')
+    return obj
+
 swagger = {
-    "swagger": "2.0",
-    "info": spec["info"],
-    "host": "${aws_lb.nlb.dns_name}",
-    "basePath": "/",
-    "schemes": ["http"],
-    "paths": {},
-    "definitions": spec.get("components", {}).get("schemas", {})
+    'swagger': '2.0',
+    'info': spec['info'],
+    'host': '${aws_lb.nlb.dns_name}',
+    'basePath': '/',
+    'schemes': ['http'],
+    'paths': {},
+    'definitions': convert_refs(spec.get('components', {}).get('schemas', {}))
 }
 
-# Convert paths
-for path, methods in spec.get("paths", {}).items():
-    swagger["paths"][path] = {}
+for path, methods in spec.get('paths', {}).items():
+    swagger['paths'][path] = {}
     for method, details in methods.items():
-        if method in ["get", "post", "put", "delete", "patch"]:
-            swagger["paths"][path][method] = {
-                "summary": details.get("summary", ""),
-                "description": details.get("description", ""),
-                "produces": ["application/json"],
-                "responses": details.get("responses", {}),
-                "x-amazon-apigateway-integration": {
-                    "type": "http_proxy",
-                    "httpMethod": method.upper(),
-                    "uri": "http://$${stageVariables.nlb_dns}" + path,
-                    "connectionType": "VPC_LINK",
-                    "connectionId": "$${stageVariables.vpc_link_id}",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
+        if method in ['get', 'post', 'put', 'delete', 'patch']:
+            swagger['paths'][path][method] = {
+                'summary': details.get('summary', ''),
+                'description': details.get('description', ''),
+                'produces': ['application/json'],
+                'responses': {},
+                'x-amazon-apigateway-integration': {
+                    'type': 'http_proxy',
+                    'httpMethod': method.upper(),
+                    'uri': 'http://' + '\$' + '{stageVariables.nlb_dns}' + path,
+                    'connectionType': 'VPC_LINK',
+                    'connectionId': '\$' + '{stageVariables.vpc_link_id}',
+                    'responses': {
+                        'default': {
+                            'statusCode': '200'
                         }
                     }
                 }
             }
-            if "requestBody" in details:
-                swagger["paths"][path][method]["consumes"] = ["application/json"]
-                swagger["paths"][path][method]["parameters"] = [{
-                    "in": "body",
-                    "name": "body",
-                    "required": True,
-                    "schema": details["requestBody"]["content"]["application/json"]["schema"]
+            # Convert responses
+            for status, response in details.get('responses', {}).items():
+                swagger['paths'][path][method]['responses'][status] = {
+                    'description': response.get('description', '')
+                }
+                if 'content' in response and 'application/json' in response['content']:
+                    schema = convert_refs(response['content']['application/json'].get('schema', {}))
+                    swagger['paths'][path][method]['responses'][status]['schema'] = schema
+            
+            if 'requestBody' in details:
+                swagger['paths'][path][method]['consumes'] = ['application/json']
+                schema = convert_refs(details['requestBody']['content']['application/json']['schema'])
+                swagger['paths'][path][method]['parameters'] = [{
+                    'in': 'body',
+                    'name': 'body',
+                    'required': True,
+                    'schema': schema
                 }]
 
 with open('openapi.json', 'w') as f:
     json.dump(swagger, f, indent=2)
-PYTHON
+        \"
+      "
     EOT
   }
 

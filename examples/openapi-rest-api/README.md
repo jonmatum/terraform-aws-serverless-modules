@@ -12,10 +12,16 @@ FastAPI application with automatic OpenAPI schema import to API Gateway REST API
 
 ## Architecture
 
-1. FastAPI generates OpenAPI 3.0 schema
+1. FastAPI generates OpenAPI 3.0 schema (via Docker during deployment)
 2. Schema converted to Swagger 2.0 for REST API compatibility
 3. Terraform imports schema and configures API Gateway
 4. VPC Link connects to ECS service via NLB
+
+## Prerequisites
+
+- AWS CLI configured with appropriate credentials
+- Docker installed and running
+- Terraform >= 1.0
 
 ## Deployment
 
