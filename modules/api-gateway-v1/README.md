@@ -2,23 +2,58 @@
 
 API Gateway REST API (v1) module with VPC Link and NLB support.
 
+## Architecture
+
+API Gateway REST API v1 requires NLB for VPC Link integration (AWS limitation).
+
+**With ALB (OpenAPI mode):**
+```
+API Gateway → VPC Link → NLB → ALB → Backend
+```
+
+**Direct to backend (Legacy mode):**
+```
+API Gateway → VPC Link → NLB → Backend
+```
+
+## Well-Architected Considerations
+
+- **Cost**: NLB adds ~$16/month. Consider HTTP API (v2) if you don't need REST API v1 features
+- **Performance**: NLB → ALB adds 1-3ms latency
+- **Reliability**: Cross-zone load balancing enabled by default
+- **Security**: Private integration via VPC Link
+
 ## Usage
+
+### OpenAPI Mode (with ALB)
 
 ```hcl
 module "api_gateway_v1" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/api-gateway-v1?ref=modules/api-gateway-v1/v0.1.0"
+  source = "../../modules/api-gateway-v1"
 
-  name                        = "my-api"
-  vpc_id                      = "vpc-xxxxx"
-  vpc_link_subnet_ids         = ["subnet-xxxxx", "subnet-yyyyy"]
-  vpc_link_security_group_ids = ["sg-xxxxx"]
-  stage_name                  = "prod"
+  name                = "my-api"
+  vpc_link_subnet_ids = ["subnet-xxxxx", "subnet-yyyyy"]
+  vpc_id              = "vpc-xxxxx"
+  alb_arn             = "arn:aws:elasticloadbalancing:..."
+  health_check_path   = "/health"
+
+  openapi_spec = file("swagger.json")
+}
+```
+
+### Legacy Mode (direct integration)
+
+```hcl
+module "api_gateway_v1" {
+  source = "../../modules/api-gateway-v1"
+
+  name                = "my-api"
+  vpc_link_subnet_ids = ["subnet-xxxxx", "subnet-yyyyy"]
 
   integrations = {
     api = {
       http_method     = "ANY"
-      resource_path   = "api"
-      integration_uri = "http://internal-nlb.local"
+      integration_uri = "http://nlb-dns-name"
     }
   }
 }

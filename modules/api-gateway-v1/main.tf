@@ -10,7 +10,9 @@ terraform {
 
 locals {
   use_openapi = var.openapi_spec != null
-  use_nlb     = !local.use_openapi
+  # NLB is always created for REST API v1 VPC Link (AWS requirement)
+  # Target can be ALB or direct backend
+  create_alb_target = local.use_openapi && var.alb_arn != null
 }
 
 # REST API - OpenAPI mode
@@ -34,7 +36,7 @@ resource "aws_api_gateway_rest_api" "openapi" {
 
 # REST API - Legacy mode
 resource "aws_api_gateway_rest_api" "legacy" {
-  count = local.use_nlb ? 1 : 0
+  count = !local.use_openapi ? 1 : 0
   name  = var.name
 
   endpoint_configuration {
@@ -44,25 +46,38 @@ resource "aws_api_gateway_rest_api" "legacy" {
   tags = var.tags
 }
 
-# NLB for VPC Link (both modes - API Gateway requires NLB)
+# NLB for VPC Link (API Gateway v1 requirement)
 resource "aws_lb" "nlb" {
-  count              = 1
-  name               = "${var.name}-nlb"
-  internal           = true
-  load_balancer_type = "network"
-  subnets            = var.vpc_link_subnet_ids
+  count                            = 1
+  name                             = "${var.name}-nlb"
+  internal                         = true
+  load_balancer_type               = "network"
+  subnets                          = var.vpc_link_subnet_ids
+  enable_cross_zone_load_balancing = true
+
+  enable_deletion_protection = var.enable_deletion_protection
+
+  dynamic "access_logs" {
+    for_each = var.enable_nlb_access_logs && var.nlb_access_logs_bucket != null ? [1] : []
+    content {
+      bucket  = var.nlb_access_logs_bucket
+      enabled = true
+    }
+  }
 
   tags = var.tags
 }
 
 # NLB Target Group - points to ALB in OpenAPI mode
 resource "aws_lb_target_group" "nlb" {
-  count       = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
-  name        = "${var.name}-nlb-tg"
-  port        = 80
-  protocol    = "TCP"
-  target_type = "alb"
-  vpc_id      = var.vpc_id
+  count                = local.create_alb_target ? 1 : 0
+  name                 = "${var.name}-nlb-tg"
+  port                 = 80
+  protocol             = "TCP"
+  target_type          = "alb"
+  vpc_id               = var.vpc_id
+  deregistration_delay = 30
+  proxy_protocol_v2    = false
 
   health_check {
     enabled             = true
@@ -79,7 +94,7 @@ resource "aws_lb_target_group" "nlb" {
 
 # Attach ALB to NLB target group
 resource "aws_lb_target_group_attachment" "alb" {
-  count            = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
+  count            = local.create_alb_target ? 1 : 0
   target_group_arn = aws_lb_target_group.nlb[0].arn
   target_id        = var.alb_arn
   port             = 80
@@ -87,7 +102,7 @@ resource "aws_lb_target_group_attachment" "alb" {
 
 # NLB Listener - forwards to ALB in OpenAPI mode
 resource "aws_lb_listener" "nlb" {
-  count             = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
+  count             = local.create_alb_target ? 1 : 0
   load_balancer_arn = aws_lb.nlb[0].arn
   port              = 80
   protocol          = "TCP"
@@ -111,7 +126,7 @@ resource "aws_api_gateway_vpc_link" "this" {
 
 # Legacy mode resources
 resource "aws_api_gateway_resource" "this" {
-  for_each = local.use_nlb ? var.integrations : {}
+  for_each = !local.use_openapi ? var.integrations : {}
 
   rest_api_id = aws_api_gateway_rest_api.legacy[0].id
   parent_id   = aws_api_gateway_rest_api.legacy[0].root_resource_id
@@ -119,7 +134,7 @@ resource "aws_api_gateway_resource" "this" {
 }
 
 resource "aws_api_gateway_method" "this" {
-  for_each = local.use_nlb ? var.integrations : {}
+  for_each = !local.use_openapi ? var.integrations : {}
 
   rest_api_id   = aws_api_gateway_rest_api.legacy[0].id
   resource_id   = aws_api_gateway_resource.this[each.key].id
@@ -128,7 +143,7 @@ resource "aws_api_gateway_method" "this" {
 }
 
 resource "aws_api_gateway_integration" "this" {
-  for_each = local.use_nlb ? var.integrations : {}
+  for_each = !local.use_openapi ? var.integrations : {}
 
   rest_api_id = aws_api_gateway_rest_api.legacy[0].id
   resource_id = aws_api_gateway_resource.this[each.key].id

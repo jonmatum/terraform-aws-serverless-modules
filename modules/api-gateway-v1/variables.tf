@@ -32,6 +32,24 @@ variable "health_check_path" {
   default     = "/health"
 }
 
+variable "enable_deletion_protection" {
+  description = "Enable deletion protection for NLB"
+  type        = bool
+  default     = false
+}
+
+variable "enable_nlb_access_logs" {
+  description = "Enable NLB access logs"
+  type        = bool
+  default     = false
+}
+
+variable "nlb_access_logs_bucket" {
+  description = "S3 bucket for NLB access logs"
+  type        = string
+  default     = null
+}
+
 variable "openapi_spec" {
   description = "OpenAPI/Swagger specification (JSON string). If provided, uses OpenAPI mode instead of integrations."
   type        = string
