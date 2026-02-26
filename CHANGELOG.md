@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.0.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v1.0.0...v2.0.0) (2026-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api-gateway-v1:** Module now requires vpc_id and alb_arn when using OpenAPI mode with ALB
+* **api-gateway:** api-gateway-v1 now requires alb_arn, vpc_id, and health_check_path when using OpenAPI mode with ALB
+
+### Features
+
+* **ecs-app:** add deployment scripts for Docker image build and push ([54114c7](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/54114c76ece4dc96204f7fc629c60e6bdd41d802))
+* **examples:** add crud-api-http with optimized HTTP API (v2) ([6558e39](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/6558e39f2d6e3f284817bdf9c55f9b1f3f507e4f))
+
+
+### Bug Fixes
+
+* add cluster_name outputs to all examples for deployment scripts ([b72d474](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/b72d474025186334924fed26e48ac478d17e5a4c))
+* **api-gateway-v1:** implement NLB-to-ALB bridge for REST API VPC Link ([a96e513](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/a96e513261b4de9821cf1a90a720a169134da326))
+* **api-gateway:** correct VPC Link architecture and health checks ([f8c0ca6](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/f8c0ca62111ebe46cc0d3f96de2685ff1838f885))
+* **crud-api-rest:** update example for api-gateway-v1 module changes ([2803e2e](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/2803e2e55a4ec24494d166063974f516926577ac))
+* **ecs-app:** create ECR repository before pushing image ([ef53816](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/ef538168fc6d220e2897142c8810b12aba3ea8ab))
+* **ecs-app:** simplify deploy script ([c2d34ae](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/c2d34ae31e4b357236461df68ee5b83ee16e91f8))
+* **ecs:** add cluster_name output to ECS module ([268109e](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/268109e7946210103fad849948d8cbc9aae50388))
+* **examples:** correct deployment scripts for cross-platform compatibility and proper deployment order ([2132174](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/2132174a3cf4b623849a53079acc7b3256523896))
+
 ## [1.0.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v0.1.0...v1.0.0) (2026-02-25)
 
 
