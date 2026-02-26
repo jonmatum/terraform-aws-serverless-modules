@@ -14,6 +14,24 @@ variable "alb_listener_arn" {
   default     = null
 }
 
+variable "alb_arn" {
+  description = "ARN of the ALB to attach to NLB (required when using OpenAPI mode with ALB)"
+  type        = string
+  default     = null
+}
+
+variable "vpc_id" {
+  description = "VPC ID for NLB target group (required when using OpenAPI mode with ALB)"
+  type        = string
+  default     = null
+}
+
+variable "health_check_path" {
+  description = "Health check path for NLB target group"
+  type        = string
+  default     = "/health"
+}
+
 variable "openapi_spec" {
   description = "OpenAPI/Swagger specification (JSON string). If provided, uses OpenAPI mode instead of integrations."
   type        = string

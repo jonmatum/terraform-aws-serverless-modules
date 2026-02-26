@@ -8,6 +8,10 @@ app.get('/api/mcp', (req, res) => {
   res.json({ service: 'mcp', message: 'Hello from Node MCP on ECS!' });
 });
 
+app.get('/api/mcp/', (req, res) => {
+  res.json({ service: 'mcp', message: 'Hello from Node MCP on ECS!' });
+});
+
 app.get('/api/mcp/health', (req, res) => {
   res.json({ status: 'healthy' });
 });

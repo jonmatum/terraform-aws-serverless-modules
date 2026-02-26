@@ -22,7 +22,7 @@ resource "aws_api_gateway_rest_api" "openapi" {
   body = replace(
     var.openapi_spec,
     "$${vpc_link_id}",
-    aws_api_gateway_vpc_link.alb[0].id
+    aws_api_gateway_vpc_link.this[0].id
   )
 
   endpoint_configuration {
@@ -44,18 +44,9 @@ resource "aws_api_gateway_rest_api" "legacy" {
   tags = var.tags
 }
 
-# VPC Link for ALB (OpenAPI mode)
-resource "aws_api_gateway_vpc_link" "alb" {
-  count       = local.use_openapi ? 1 : 0
-  name        = "${var.name}-vpc-link"
-  target_arns = [var.alb_listener_arn]
-
-  tags = var.tags
-}
-
-# NLB for VPC Link (Legacy mode)
+# NLB for VPC Link (both modes - API Gateway requires NLB)
 resource "aws_lb" "nlb" {
-  count              = local.use_nlb ? 1 : 0
+  count              = 1
   name               = "${var.name}-nlb"
   internal           = true
   load_balancer_type = "network"
@@ -64,9 +55,54 @@ resource "aws_lb" "nlb" {
   tags = var.tags
 }
 
-# VPC Link for NLB (Legacy mode)
-resource "aws_api_gateway_vpc_link" "nlb" {
-  count       = local.use_nlb ? 1 : 0
+# NLB Target Group - points to ALB in OpenAPI mode
+resource "aws_lb_target_group" "nlb" {
+  count       = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
+  name        = "${var.name}-nlb-tg"
+  port        = 80
+  protocol    = "TCP"
+  target_type = "alb"
+  vpc_id      = var.vpc_id
+
+  health_check {
+    enabled             = true
+    protocol            = "HTTP"
+    path                = var.health_check_path
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+  }
+
+  tags = var.tags
+}
+
+# Attach ALB to NLB target group
+resource "aws_lb_target_group_attachment" "alb" {
+  count            = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
+  target_group_arn = aws_lb_target_group.nlb[0].arn
+  target_id        = var.alb_arn
+  port             = 80
+}
+
+# NLB Listener - forwards to ALB in OpenAPI mode
+resource "aws_lb_listener" "nlb" {
+  count             = local.use_openapi && var.alb_listener_arn != null ? 1 : 0
+  load_balancer_arn = aws_lb.nlb[0].arn
+  port              = 80
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nlb[0].arn
+  }
+
+  tags = var.tags
+}
+
+# VPC Link (both modes)
+resource "aws_api_gateway_vpc_link" "this" {
+  count       = 1
   name        = "${var.name}-vpc-link"
   target_arns = [aws_lb.nlb[0].arn]
 
@@ -102,7 +138,7 @@ resource "aws_api_gateway_integration" "this" {
   integration_http_method = each.value.http_method
   uri                     = each.value.integration_uri
   connection_type         = "VPC_LINK"
-  connection_id           = aws_api_gateway_vpc_link.nlb[0].id
+  connection_id           = aws_api_gateway_vpc_link.this[0].id
 
   request_parameters = {
     "integration.request.path.proxy" = "method.request.path.proxy"

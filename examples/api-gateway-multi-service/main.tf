@@ -46,7 +46,7 @@ module "alb_fastapi" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.private_subnet_ids
   target_port       = 8000
-  health_check_path = "/"
+  health_check_path = "/api/fastapi/health"
 
   tags = var.tags
 }
@@ -87,7 +87,7 @@ module "alb_mcp" {
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.private_subnet_ids
   target_port       = 3000
-  health_check_path = "/"
+  health_check_path = "/api/mcp/health"
 
   tags = var.tags
 }

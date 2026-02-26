@@ -65,9 +65,12 @@ resource "aws_dynamodb_table" "this" {
   }
 
   # Encryption
-  server_side_encryption {
-    enabled     = var.enable_encryption
-    kms_key_arn = var.kms_key_arn
+  dynamic "server_side_encryption" {
+    for_each = var.enable_encryption ? [1] : []
+    content {
+      enabled     = true
+      kms_key_arn = var.kms_key_arn
+    }
   }
 
   # Streams

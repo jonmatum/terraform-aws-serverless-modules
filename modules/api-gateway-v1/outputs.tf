@@ -15,15 +15,15 @@ output "stage_arn" {
 
 output "vpc_link_id" {
   description = "VPC Link ID"
-  value       = local.use_openapi ? aws_api_gateway_vpc_link.alb[0].id : aws_api_gateway_vpc_link.nlb[0].id
+  value       = aws_api_gateway_vpc_link.this[0].id
 }
 
 output "nlb_arn" {
-  description = "Network Load Balancer ARN (legacy mode only)"
-  value       = local.use_openapi ? null : aws_lb.nlb[0].arn
+  description = "Network Load Balancer ARN"
+  value       = aws_lb.nlb[0].arn
 }
 
 output "nlb_dns_name" {
-  description = "Network Load Balancer DNS name (legacy mode only)"
-  value       = local.use_openapi ? null : aws_lb.nlb[0].dns_name
+  description = "Network Load Balancer DNS name"
+  value       = aws_lb.nlb[0].dns_name
 }

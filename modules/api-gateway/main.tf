@@ -47,12 +47,10 @@ resource "aws_apigatewayv2_stage" "default" {
   name        = "$default"
   auto_deploy = true
 
-  dynamic "default_route_settings" {
-    for_each = var.enable_throttling ? [1] : []
-    content {
-      throttling_burst_limit = var.throttle_burst_limit
-      throttling_rate_limit  = var.throttle_rate_limit
-    }
+  default_route_settings {
+    detailed_metrics_enabled = var.enable_xray_tracing
+    throttling_burst_limit   = var.enable_throttling ? var.throttle_burst_limit : null
+    throttling_rate_limit    = var.enable_throttling ? var.throttle_rate_limit : null
   }
 
   dynamic "access_log_settings" {
@@ -84,22 +82,4 @@ resource "aws_cloudwatch_log_group" "api_gateway" {
   retention_in_days = 30
 
   tags = var.tags
-}
-
-# X-Ray Tracing
-resource "aws_apigatewayv2_stage" "xray" {
-  count       = var.enable_xray_tracing ? 1 : 0
-  api_id      = aws_apigatewayv2_api.this.id
-  name        = "$default"
-  auto_deploy = true
-
-  default_route_settings {
-    detailed_metrics_enabled = true
-  }
-
-  tags = var.tags
-
-  lifecycle {
-    ignore_changes = [default_route_settings]
-  }
 }

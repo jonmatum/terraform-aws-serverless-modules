@@ -106,6 +106,9 @@ module "api_gateway_rest" {
   name                = "${var.project_name}-api"
   vpc_link_subnet_ids = module.vpc.private_subnet_ids
   alb_listener_arn    = module.alb.listener_arn
+  alb_arn             = module.alb.alb_arn
+  vpc_id              = module.vpc.vpc_id
+  health_check_path   = "/health"
 
   # OpenAPI/Swagger specification
   openapi_spec = templatefile("${path.module}/swagger.json", {
