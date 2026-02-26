@@ -7,10 +7,12 @@ Complete CRUD application with FastAPI backend, DynamoDB, API Gateway REST API w
 ```
 Internet → CloudFront → S3 (React App)
               ↓
-         API Gateway REST API (v1) → VPC Link → ALB → ECS (FastAPI) → DynamoDB
+         API Gateway REST API (v1) → VPC Link → NLB → ALB → ECS (FastAPI) → DynamoDB
               ↓
          WAF (optional)
 ```
+
+**Note**: API Gateway REST API v1 requires NLB for VPC Link (AWS limitation). The NLB forwards traffic to ALB, which then routes to ECS. This adds ~$16/month for the NLB and 1-3ms latency. For cost optimization, consider using API Gateway HTTP API (v2) which supports ALB directly.
 
 ## Features
 
@@ -147,22 +149,26 @@ variable "aws_region" {
 
 ## Cost Estimate
 
-**Development** (~$70-90/month):
+**Development** (~$85-105/month):
 - DynamoDB: $1-5 (PAY_PER_REQUEST)
 - ECS Fargate: $15-30
 - NAT Gateway: $32 (single)
+- NLB: $16
 - ALB: $16
 - API Gateway: $3.50/million requests
 - CloudFront: $0.085/GB
 - S3: $0.023/GB
 
-**Production** (~$200-400/month):
+**Production** (~$215-430/month):
 - DynamoDB: $10-50
 - ECS Fargate: $60-120 (auto-scaling)
 - NAT Gateway: $64 (multi-AZ)
+- NLB: $16
 - ALB: $16
 - API Gateway: Higher with traffic
 - WAF: $5 + $1/million requests
+
+**Cost Optimization**: Consider HTTP API (v2) to eliminate NLB ($16/month savings)
 
 ## Cleanup
 

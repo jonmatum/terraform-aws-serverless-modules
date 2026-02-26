@@ -6,6 +6,28 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/": {
+      "get": {
+        "summary": "API root",
+        "responses": {
+          "200": {
+            "description": "API information"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
     "/items": {
       "get": {
         "summary": "List all items",
@@ -188,6 +210,105 @@
           "type": "http_proxy",
           "httpMethod": "GET",
           "uri": "http://${alb_dns}/health",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
+    "/docs": {
+      "get": {
+        "summary": "API documentation (Swagger UI)",
+        "responses": {
+          "200": {
+            "description": "Swagger UI"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/docs",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
+    "/docs/{proxy+}": {
+      "get": {
+        "summary": "API documentation resources",
+        "parameters": [
+          {
+            "name": "proxy",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documentation resource"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/docs/{proxy}",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "requestParameters": {
+            "integration.request.path.proxy": "method.request.path.proxy"
+          },
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
+    "/redoc": {
+      "get": {
+        "summary": "API documentation (ReDoc)",
+        "responses": {
+          "200": {
+            "description": "ReDoc UI"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/redoc",
+          "connectionType": "VPC_LINK",
+          "connectionId": "$${vpc_link_id}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "OpenAPI specification",
+        "responses": {
+          "200": {
+            "description": "OpenAPI JSON"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "http_proxy",
+          "httpMethod": "GET",
+          "uri": "http://${alb_dns}/openapi.json",
           "connectionType": "VPC_LINK",
           "connectionId": "$${vpc_link_id}",
           "responses": {
