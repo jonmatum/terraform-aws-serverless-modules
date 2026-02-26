@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.1.0...v3.0.0) (2026-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* Restructured ecs-app example with separate terraform/ and app/ directories
+
+### Documentation
+
+* improve Terraform Registry compatibility and architecture documentation ([350b88b](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/350b88be0a4651c1466a5677a3df1dc2df1c6e08))
+
 ## [2.1.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.0.1...v2.1.0) (2026-02-26)
 
 
