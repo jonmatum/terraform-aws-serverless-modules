@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.0.0...v2.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **openapi-rest-api:** use Docker for OpenAPI generation and fix schema conversion ([caebdc7](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/caebdc72a0bcb6ee1da2cf9fb0121d4964cc2625))
+
 ## [2.0.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v1.0.0...v2.0.0) (2026-02-26)
 
 
