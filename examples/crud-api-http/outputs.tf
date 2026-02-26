@@ -10,12 +10,12 @@ output "api_docs_url" {
 
 output "cloudfront_url" {
   description = "CloudFront distribution URL for React app"
-  value       = module.cloudfront.cloudfront_url
+  value       = module.cloudfront.website_url
 }
 
 output "s3_bucket_name" {
   description = "S3 bucket name for React app deployment"
-  value       = module.cloudfront.s3_bucket_name
+  value       = module.cloudfront.bucket_name
 }
 
 output "dynamodb_table_name" {

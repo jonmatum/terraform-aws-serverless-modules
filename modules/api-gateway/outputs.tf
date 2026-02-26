@@ -8,6 +8,11 @@ output "api_id" {
   value       = aws_apigatewayv2_api.this.id
 }
 
+output "stage_arn" {
+  description = "ARN of the API Gateway stage"
+  value       = aws_apigatewayv2_stage.default.arn
+}
+
 output "vpc_link_id" {
   description = "VPC Link ID"
   value       = aws_apigatewayv2_vpc_link.this.id

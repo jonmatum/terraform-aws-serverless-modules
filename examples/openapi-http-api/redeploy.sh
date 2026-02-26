@@ -30,14 +30,9 @@ echo "Pushing image..."
 docker push $ECR_URL:$IMAGE_TAG
 docker push $ECR_URL:latest
 
-# Regenerate OpenAPI spec if app changed
-echo ""
-echo "Regenerating OpenAPI spec..."
-pip3 install -q -r requirements.txt
-
 # Apply terraform to update API Gateway if spec changed
 echo ""
-echo "Updating API Gateway with new spec..."
+echo "Updating infrastructure..."
 terraform apply -auto-approve
 
 # Force ECS update

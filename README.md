@@ -10,7 +10,7 @@ Terraform modules for deploying serverless and container-based applications on A
 
 ## Architecture
 
-Built following [AWS Well-Architected Framework](./WELL_ARCHITECTED.md) best practices:
+Built following [AWS Well-Architected Framework](./docs/well-architected.md) best practices:
 
 - Security: Encryption, least-privilege IAM, VPC endpoints, WAF
 - Reliability: Multi-AZ, auto-scaling, health checks, monitoring
@@ -164,15 +164,15 @@ Built-in CloudWatch alarms:
 
 ```bash
 # Test all modules
-./test-modules.sh
+./scripts/test-modules.sh
 
 # Test idempotency
-./test-idempotency.sh api-gateway-multi-service
+./scripts/test-idempotency.sh api-gateway-multi-service
 ```
 
 ##  Documentation
 
-- [WELL_ARCHITECTED.md](./WELL_ARCHITECTED.md) - Architecture details
+- [well-architected.md](./docs/well-architected.md) - Architecture details
 - [modules/*/README.md](./modules/) - Module documentation
 - [examples/*/README.md](./examples/) - Example guides
 
@@ -180,7 +180,7 @@ Built-in CloudWatch alarms:
 
 ```bash
 pre-commit run --all-files
-./test-modules.sh
+./scripts/test-modules.sh
 ```
 
 ##  License

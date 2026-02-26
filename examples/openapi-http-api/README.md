@@ -19,6 +19,12 @@ FastAPI application with automatic OpenAPI schema import to API Gateway HTTP API
 
 ## Deployment
 
+### Prerequisites
+
+- AWS CLI configured with appropriate credentials
+- Docker installed and running
+- Terraform >= 1.0
+
 ### Initial Deployment
 
 ```bash
@@ -26,9 +32,10 @@ FastAPI application with automatic OpenAPI schema import to API Gateway HTTP API
 ```
 
 This will:
-1. Generate OpenAPI spec from FastAPI app
-2. Create infrastructure with API Gateway configured from spec
-3. Deploy ECS service
+1. Create ECR repository
+2. Build and push Docker image
+3. Deploy infrastructure with API Gateway configured from OpenAPI spec
+4. Deploy ECS service
 
 ### Redeploy After Code Changes
 

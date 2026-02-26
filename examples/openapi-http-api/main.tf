@@ -24,7 +24,7 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# Generate OpenAPI spec from FastAPI
+# Generate OpenAPI spec from FastAPI using Docker
 resource "null_resource" "generate_openapi" {
   triggers = {
     app_hash = filemd5("${path.module}/app.py")
@@ -33,14 +33,18 @@ resource "null_resource" "generate_openapi" {
   provisioner "local-exec" {
     command = <<-EOT
       cd ${path.module}
-      python3 -c "
+      docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "
+        pip install -q fastapi uvicorn && \
+        python3 -c \"
 import json
 from app import app
 spec = app.openapi()
-# Update servers to point to VPC Link
+# Downgrade to OpenAPI 3.0.3 for API Gateway compatibility
+spec['openapi'] = '3.0.3'
 spec['servers'] = [{'url': 'http://${aws_lb.nlb.dns_name}'}]
 with open('openapi.json', 'w') as f:
     json.dump(spec, f, indent=2)
+        \"
       "
     EOT
   }
@@ -158,7 +162,7 @@ resource "aws_apigatewayv2_integration" "this" {
   api_id             = aws_apigatewayv2_api.this.id
   integration_type   = "HTTP_PROXY"
   integration_method = "ANY"
-  integration_uri    = "http://${aws_lb.nlb.dns_name}/{proxy}"
+  integration_uri    = aws_lb_listener.this.arn
   connection_type    = "VPC_LINK"
   connection_id      = aws_apigatewayv2_vpc_link.this.id
 
