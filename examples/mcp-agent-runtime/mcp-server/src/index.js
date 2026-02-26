@@ -1,6 +1,7 @@
 const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
-const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
+const { ListToolsRequestSchema, CallToolRequestSchema } = require('@modelcontextprotocol/sdk/types.js');
 const express = require('express');
+const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,8 +13,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', service: 'mcp-server' });
 });
 
-// MCP server instance
-const mcpServer = new Server(
+// Create MCP server instance
+const server = new Server(
   {
     name: 'aws-ecs-mcp-server',
     version: '1.0.0',
@@ -21,14 +22,12 @@ const mcpServer = new Server(
   {
     capabilities: {
       tools: {},
-      resources: {},
-      prompts: {},
     },
   }
 );
 
-// Register MCP tools
-mcpServer.setRequestHandler('tools/list', async () => {
+// Register tools/list handler
+server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
@@ -57,8 +56,8 @@ mcpServer.setRequestHandler('tools/list', async () => {
   };
 });
 
-// Handle tool calls
-mcpServer.setRequestHandler('tools/call', async (request) => {
+// Register tools/call handler
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   switch (name) {
@@ -69,11 +68,14 @@ mcpServer.setRequestHandler('tools/call', async (request) => {
             type: 'text',
             text: JSON.stringify({
               platform: process.platform,
+              arch: process.arch,
               nodeVersion: process.version,
               memory: process.memoryUsage(),
               uptime: process.uptime(),
+              hostname: os.hostname(),
               env: {
                 AWS_REGION: process.env.AWS_REGION,
+                NODE_ENV: process.env.NODE_ENV,
                 ECS_CONTAINER_METADATA_URI: process.env.ECS_CONTAINER_METADATA_URI ? 'set' : 'not set',
               },
             }, null, 2),
@@ -96,26 +98,21 @@ mcpServer.setRequestHandler('tools/call', async (request) => {
   }
 });
 
-// HTTP endpoint to interact with MCP server
-app.post('/mcp/tools/list', async (req, res) => {
+// MCP endpoint for AgentCore Gateway
+app.post('/mcp', async (req, res) => {
   try {
-    const result = await mcpServer.request({ method: 'tools/list' }, {});
-    res.json(result);
+    const request = req.body;
+    const response = await server.request(request, {});
+    res.json(response);
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/mcp/tools/call', async (req, res) => {
-  try {
-    const { name, arguments: args } = req.body;
-    const result = await mcpServer.request(
-      { method: 'tools/call', params: { name, arguments: args } },
-      {}
-    );
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      jsonrpc: '2.0',
+      error: {
+        code: -32603,
+        message: error.message
+      },
+      id: req.body.id
+    });
   }
 });
 
