@@ -9,22 +9,22 @@ graph TB
     subgraph "Client"
         User[API Client]
     end
-    
+
     subgraph "API Gateway REST API"
         APIGW[API Gateway REST API v1]
         VPCLink[VPC Link]
     end
-    
+
     subgraph "Private Network"
         NLB[Network Load Balancer<br/>Required for REST API]
         ECS[ECS Fargate<br/>FastAPI Service]
     end
-    
+
     subgraph "Services"
         ECR[ECR Repository]
         CW[CloudWatch Logs]
     end
-    
+
     User --> APIGW
     APIGW --> VPCLink
     VPCLink --> NLB
@@ -42,7 +42,7 @@ sequenceDiagram
     participant VPCLink as VPC Link
     participant NLB
     participant ECS as FastAPI Service
-    
+
     Client->>APIGW: GET /api/health
     APIGW->>APIGW: Route Matching
     APIGW->>VPCLink: Forward to VPC Link
@@ -64,7 +64,7 @@ graph TB
         PrivSub[Private Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "API Gateway v1 Module"
         APIGW[REST API]
         VPCLink[VPC Link]
@@ -72,24 +72,24 @@ graph TB
         Method[API Method ANY]
         Integration[VPC Link Integration]
     end
-    
+
     subgraph "Network Load Balancer"
         NLB[NLB<br/>Private Subnets]
         NLBListener[NLB Listener<br/>Port 8000]
         NLBTarget[NLB Target Group]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service<br/>FastAPI]
         TaskDef[Task Definition]
         AutoScale[Auto Scaling]
     end
-    
+
     subgraph "ECR Module"
         ECR[ECR Repository]
     end
-    
+
     APIGW --> Resource
     Resource --> Method
     Method --> Integration
@@ -111,16 +111,16 @@ graph LR
         Client[Client]
         APIGW[API Gateway]
     end
-    
+
     subgraph "VPC Link"
         VPCLink[VPC Link<br/>Managed ENIs]
     end
-    
+
     subgraph "Private VPC"
         NLB[NLB<br/>Private Subnets]
         ECS[ECS Tasks<br/>Private Subnets]
     end
-    
+
     Client -->|HTTPS| APIGW
     APIGW -->|Private Connection| VPCLink
     VPCLink -->|Internal| NLB

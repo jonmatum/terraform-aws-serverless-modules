@@ -21,7 +21,7 @@ module "cloudwatch_alarms" {
   ecs_cluster_name = "my-cluster"
   ecs_service_name = "my-service"
   alb_arn_suffix   = "app/my-alb/1234567890"
-  
+
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
 ```
@@ -43,7 +43,7 @@ module "cloudwatch_alarms" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.33.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.34.0 |
 
 ## Modules
 
@@ -63,7 +63,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_alb_arn_suffix"></a> [alb\_arn\_suffix](#input\_alb\_arn\_suffix) | ALB ARN suffix for metrics | `string` | `null` | no |
+| <a name="input_alb_arn_suffix"></a> [alb\_arn\_suffix](#input\_alb\_arn\_suffix) | ALB ARN suffix for metrics | `string` | `""` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | ECS cluster name | `string` | n/a | yes |
 | <a name="input_cpu_threshold"></a> [cpu\_threshold](#input\_cpu\_threshold) | CPU utilization threshold percentage | `number` | `80` | no |
 | <a name="input_enable_alarms"></a> [enable\_alarms](#input\_enable\_alarms) | Enable CloudWatch alarms | `bool` | `true` | no |
@@ -71,7 +71,7 @@ No modules.
 | <a name="input_service_name"></a> [service\_name](#input\_service\_name) | ECS service name | `string` | n/a | yes |
 | <a name="input_sns_topic_arn"></a> [sns\_topic\_arn](#input\_sns\_topic\_arn) | SNS topic ARN for alarm notifications | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources | `map(string)` | `{}` | no |
-| <a name="input_target_group_arn_suffix"></a> [target\_group\_arn\_suffix](#input\_target\_group\_arn\_suffix) | Target group ARN suffix for metrics | `string` | `null` | no |
+| <a name="input_target_group_arn_suffix"></a> [target\_group\_arn\_suffix](#input\_target\_group\_arn\_suffix) | Target group ARN suffix for metrics | `string` | `""` | no |
 | <a name="input_target_response_time"></a> [target\_response\_time](#input\_target\_response\_time) | Target response time in seconds | `number` | `1` | no |
 
 ## Outputs

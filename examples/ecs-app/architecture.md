@@ -9,25 +9,25 @@ graph TB
     subgraph "Internet"
         Client[Client]
     end
-    
+
     subgraph "AWS Cloud"
         subgraph "Public Subnet"
             ALB[Application Load Balancer]
             NAT[NAT Gateway]
         end
-        
+
         subgraph "Private Subnet"
             ECS1[ECS Task 1<br/>FastAPI App]
             ECS2[ECS Task 2<br/>FastAPI App]
         end
-        
+
         subgraph "Services"
             ECR[ECR Repository<br/>Container Images]
             CW[CloudWatch<br/>Logs & Metrics]
             WAF[AWS WAF<br/>Rate Limiting]
         end
     end
-    
+
     Client --> WAF
     WAF --> ALB
     ALB --> ECS1
@@ -52,52 +52,52 @@ graph TB
         IGW[Internet Gateway]
         NAT1[NAT Gateway]
     end
-    
+
     subgraph "ECR Module"
         ECR[ECR Repository<br/>Encrypted]
         Lifecycle[Lifecycle Policy<br/>Keep 5 images]
     end
-    
+
     subgraph "ALB Module"
         ALB[Application LB]
         TG[Target Group<br/>Health Checks]
         Listener[HTTP Listener<br/>Port 80]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service<br/>Fargate]
         TaskDef[Task Definition<br/>FastAPI Container]
         AutoScale[Auto Scaling<br/>2-4 tasks]
     end
-    
+
     subgraph "WAF Module"
         WAF[Web ACL]
         RateLimit[Rate Limit Rule<br/>2000 req/5min]
         IPReputation[IP Reputation Rule]
     end
-    
+
     subgraph "CloudWatch Module"
         CPUAlarm[CPU Alarm<br/>>80%]
         MemAlarm[Memory Alarm<br/>>80%]
         TargetAlarm[Unhealthy Target Alarm]
     end
-    
+
     VPC --> PubSub
     VPC --> PrivSub
     PubSub --> IGW
     PubSub --> NAT1
     PrivSub --> NAT1
-    
+
     ALB --> TG
     ALB --> Listener
     WAF --> ALB
-    
+
     Service --> TaskDef
     Service --> AutoScale
     Cluster --> Service
     TaskDef --> ECR
-    
+
     TG --> Service
 ```
 
@@ -110,7 +110,7 @@ sequenceDiagram
     participant ALB
     participant ECS
     participant App
-    
+
     Client->>WAF: HTTP Request
     WAF->>WAF: Check Rate Limit
     WAF->>WAF: Check IP Reputation
@@ -132,21 +132,21 @@ graph LR
         CPU[CPU > 70%]
         MEM[Memory > 80%]
     end
-    
+
     subgraph "Current State"
         Tasks[2 Tasks Running]
     end
-    
+
     subgraph "Scaling Actions"
         ScaleUp[Scale Up<br/>Add 1 Task]
         ScaleDown[Scale Down<br/>Remove 1 Task]
     end
-    
+
     subgraph "Limits"
         Min[Min: 2 Tasks]
         Max[Max: 4 Tasks]
     end
-    
+
     CPU --> ScaleUp
     MEM --> ScaleUp
     ScaleUp --> Tasks
@@ -165,23 +165,23 @@ graph TB
         ALBMetric[ALB Response Time]
         TargetMetric[Unhealthy Targets]
     end
-    
+
     subgraph "Alarms"
         CPUAlarm[CPU > 80%]
         MemAlarm[Memory > 80%]
         ResponseAlarm[Response > 1s]
         TargetAlarm[Unhealthy > 0]
     end
-    
+
     subgraph "Actions"
         SNS[SNS Topic<br/>Optional]
     end
-    
+
     CPUMetric --> CPUAlarm
     MemMetric --> MemAlarm
     ALBMetric --> ResponseAlarm
     TargetMetric --> TargetAlarm
-    
+
     CPUAlarm -.-> SNS
     MemAlarm -.-> SNS
     ResponseAlarm -.-> SNS

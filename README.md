@@ -24,7 +24,7 @@ Built following [AWS Well-Architected Framework](./docs/well-architected.md) bes
 module "vpc" {
   source  = "jonmatum/serverless-modules/aws//modules/vpc"
   version = "~> 2.0"
-  
+
   project_name = "my-app"
   cidr_block   = "10.0.0.0/16"
 }
@@ -32,7 +32,7 @@ module "vpc" {
 module "ecs" {
   source  = "jonmatum/serverless-modules/aws//modules/ecs"
   version = "~> 2.0"
-  
+
   cluster_name = "my-cluster"
   vpc_id       = module.vpc.vpc_id
   subnet_ids   = module.vpc.private_subnet_ids
@@ -135,7 +135,7 @@ All modules support idempotent deployments with proper dependency management.
 ```hcl
 module "ecs" {
   source = "./modules/ecs"
-  
+
   enable_autoscaling       = true
   autoscaling_min_capacity = 1
   autoscaling_max_capacity = 10
@@ -150,13 +150,13 @@ module "ecs" {
 ```hcl
 module "vpc" {
   source = "./modules/vpc"
-  
+
   single_nat_gateway = true  # Single NAT instead of Multi-AZ
 }
 
 module "ecs" {
   source = "./modules/ecs"
-  
+
   enable_fargate_spot = true  # Use Spot pricing
   desired_count       = 1     # Minimal capacity
 }
@@ -166,14 +166,14 @@ module "ecs" {
 ```hcl
 module "vpc" {
   source = "./modules/vpc"
-  
+
   single_nat_gateway   = false  # Multi-AZ NAT
   enable_vpc_endpoints = true   # Reduce NAT costs
 }
 
 module "ecs" {
   source = "./modules/ecs"
-  
+
   enable_fargate_spot      = false
   enable_autoscaling       = true
   autoscaling_min_capacity = 2

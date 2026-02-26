@@ -41,10 +41,6 @@ module "api_gateway" {
 - [crud-api-http](../../examples/crud-api-http/) - CRUD API with HTTP API
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-    }
-  }
-}
-```
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
@@ -57,7 +53,7 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.33.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.34.0 |
 
 ## Modules
 
@@ -71,7 +67,6 @@ No modules.
 | [aws_apigatewayv2_integration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_integration) | resource |
 | [aws_apigatewayv2_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route) | resource |
 | [aws_apigatewayv2_stage.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage) | resource |
-| [aws_apigatewayv2_stage.xray](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage) | resource |
 | [aws_apigatewayv2_vpc_link.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_vpc_link) | resource |
 | [aws_cloudwatch_log_group.api_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 
@@ -96,5 +91,6 @@ No modules.
 |------|-------------|
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | API Gateway endpoint URL |
 | <a name="output_api_id"></a> [api\_id](#output\_api\_id) | API Gateway ID |
+| <a name="output_stage_arn"></a> [stage\_arn](#output\_stage\_arn) | ARN of the API Gateway stage |
 | <a name="output_vpc_link_id"></a> [vpc\_link\_id](#output\_vpc\_link\_id) | VPC Link ID |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -22,33 +22,33 @@ API Gateway REST API v1 VPC Links **require** Network Load Balancer (NLB). This 
 
 ## Well-Architected Pillars
 
-### 1. Operational Excellence 
+### 1. Operational Excellence
 - Infrastructure as Code (Terraform)
 - Automated deployments
 - CloudWatch logging enabled by default
 - X-Ray tracing support
 - Proper tagging strategy
 
-### 2. Security 
+### 2. Security
 - Private integration via VPC Link
 - No public endpoints to backend
 - Encryption in transit (TLS)
 - IAM-based access control
 - Optional WAF integration
 
-### 3. Reliability 
+### 3. Reliability
 - Multi-AZ deployment (NLB in multiple subnets)
 - Cross-zone load balancing enabled
 - Health checks configured
 - Graceful connection draining (30s deregistration delay)
 - Auto-scaling support
 
-### 4. Performance Efficiency 
+### 4. Performance Efficiency
 - **Trade-off**: NLB → ALB adds network hop
 - **Mitigation**: Use HTTP API (v2) if REST API v1 features not needed
 - **Benefit**: NLB provides high throughput and low latency
 
-### 5. Cost Optimization 
+### 5. Cost Optimization
 - **Cost**: NLB adds ~$16/month
 - **Alternative**: HTTP API (v2) supports ALB directly (no NLB needed)
 - **When to use REST API v1**:
@@ -61,7 +61,7 @@ API Gateway REST API v1 VPC Links **require** Network Load Balancer (NLB). This 
   - Cost-sensitive workloads
   - Lower latency requirements
 
-### 6. Sustainability 
+### 6. Sustainability
 - **Impact**: Extra NLB increases resource usage
 - **Mitigation**: Consider HTTP API (v2) for simpler workloads
 

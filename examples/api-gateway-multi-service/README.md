@@ -78,7 +78,7 @@ curl $API_ENDPOINT/api/mcp
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.33.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.34.0 |
 
 ## Modules
 
@@ -122,7 +122,9 @@ curl $API_ENDPOINT/api/mcp
 |------|-------------|
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | API Gateway endpoint |
 | <a name="output_ecs_fastapi_cluster_id"></a> [ecs\_fastapi\_cluster\_id](#output\_ecs\_fastapi\_cluster\_id) | FastAPI ECS cluster ID |
+| <a name="output_ecs_fastapi_cluster_name"></a> [ecs\_fastapi\_cluster\_name](#output\_ecs\_fastapi\_cluster\_name) | FastAPI ECS cluster name |
 | <a name="output_ecs_mcp_cluster_id"></a> [ecs\_mcp\_cluster\_id](#output\_ecs\_mcp\_cluster\_id) | MCP ECS cluster ID |
+| <a name="output_ecs_mcp_cluster_name"></a> [ecs\_mcp\_cluster\_name](#output\_ecs\_mcp\_cluster\_name) | MCP ECS cluster name |
 | <a name="output_fastapi_ecr_url"></a> [fastapi\_ecr\_url](#output\_fastapi\_ecr\_url) | FastAPI ECR repository URL |
 | <a name="output_mcp_ecr_url"></a> [mcp\_ecr\_url](#output\_mcp\_ecr\_url) | MCP ECR repository URL |
 | <a name="output_test_commands"></a> [test\_commands](#output\_test\_commands) | Commands to test the services |

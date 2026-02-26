@@ -103,7 +103,7 @@ uvicorn app:app --reload
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.33.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.34.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | 2.7.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 
@@ -152,6 +152,7 @@ uvicorn app:app --reload
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | API Gateway endpoint URL |
 | <a name="output_api_id"></a> [api\_id](#output\_api\_id) | API Gateway ID |
 | <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | ECR repository URL |
+| <a name="output_ecs_cluster_name"></a> [ecs\_cluster\_name](#output\_ecs\_cluster\_name) | ECS cluster name |
 | <a name="output_openapi_spec_location"></a> [openapi\_spec\_location](#output\_openapi\_spec\_location) | Location of generated OpenAPI spec |
 | <a name="output_test_commands"></a> [test\_commands](#output\_test\_commands) | Commands to test the API |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

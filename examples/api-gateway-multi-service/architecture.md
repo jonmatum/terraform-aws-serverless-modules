@@ -9,31 +9,31 @@ graph TB
     subgraph "Internet"
         Client[Client]
     end
-    
+
     subgraph "AWS Cloud"
         subgraph "API Gateway"
             APIGW[API Gateway HTTP API]
             VPCLink[VPC Link]
         end
-        
+
         subgraph "Public Subnet"
             NAT[NAT Gateway]
         end
-        
+
         subgraph "Private Subnet"
             ALB1[ALB FastAPI<br/>Port 8000]
             ALB2[ALB MCP<br/>Port 3000]
             ECS1[ECS FastAPI Service<br/>2-4 tasks]
             ECS2[ECS MCP Service<br/>2-4 tasks]
         end
-        
+
         subgraph "Services"
             ECR1[ECR FastAPI<br/>Repository]
             ECR2[ECR MCP<br/>Repository]
             CW[CloudWatch<br/>Logs & Metrics]
         end
     end
-    
+
     Client --> APIGW
     APIGW --> VPCLink
     VPCLink --> ALB1
@@ -57,20 +57,20 @@ graph LR
         ReqFastAPI[GET /api/fastapi/*]
         ReqMCP[GET /api/mcp/*]
     end
-    
+
     subgraph "API Gateway"
         APIGW[API Gateway<br/>HTTP API]
     end
-    
+
     subgraph "VPC Link"
         VPCLink[VPC Link<br/>Private Connection]
     end
-    
+
     subgraph "Target Services"
         ALB1[ALB FastAPI<br/>:8000]
         ALB2[ALB MCP<br/>:3000]
     end
-    
+
     ReqFastAPI --> APIGW
     ReqMCP --> APIGW
     APIGW --> VPCLink
@@ -88,52 +88,52 @@ graph TB
         PrivSub[Private Subnets<br/>2 AZs]
         NAT1[NAT Gateway]
     end
-    
+
     subgraph "API Gateway Module"
         APIGW[API Gateway v2<br/>HTTP API]
         VPCLink[VPC Link]
         Routes[Routes<br/>/api/fastapi/*<br/>/api/mcp/*]
         Integration[VPC Link Integration]
     end
-    
+
     subgraph "FastAPI Service"
         ECR1[ECR Repository]
         ALB1[ALB FastAPI]
         ECS1[ECS Service<br/>FastAPI]
         TG1[Target Group<br/>:8000]
     end
-    
+
     subgraph "MCP Service"
         ECR2[ECR Repository]
         ALB2[ALB MCP]
         ECS2[ECS Service<br/>MCP]
         TG2[Target Group<br/>:3000]
     end
-    
+
     subgraph "Monitoring"
         CWLogs[CloudWatch Logs]
         CWAlarms[CloudWatch Alarms]
     end
-    
+
     VPC --> PrivSub
     VPC --> PubSub
     PubSub --> NAT1
-    
+
     APIGW --> Routes
     APIGW --> VPCLink
     Routes --> Integration
     Integration --> VPCLink
     VPCLink --> ALB1
     VPCLink --> ALB2
-    
+
     ALB1 --> TG1
     TG1 --> ECS1
     ECS1 --> ECR1
-    
+
     ALB2 --> TG2
     TG2 --> ECS2
     ECS2 --> ECR2
-    
+
     ECS1 -.-> CWLogs
     ECS2 -.-> CWLogs
     ALB1 -.-> CWAlarms
@@ -150,7 +150,7 @@ sequenceDiagram
     participant ALB as Private ALB
     participant ECS as ECS Service
     participant App
-    
+
     Client->>APIGW: GET /api/fastapi/health
     APIGW->>APIGW: Route Matching
     APIGW->>VPCLink: Forward to VPC Link
@@ -176,7 +176,7 @@ graph TB
         FastAPI_ECR[ECR Repository]
         FastAPI_Scale[Auto Scaling<br/>2-4 tasks]
     end
-    
+
     subgraph "MCP Service"
         MCP_ALB[Dedicated ALB]
         MCP_TG[Target Group :3000]
@@ -184,24 +184,24 @@ graph TB
         MCP_ECR[ECR Repository]
         MCP_Scale[Auto Scaling<br/>2-4 tasks]
     end
-    
+
     subgraph "Shared Infrastructure"
         VPC[VPC]
         Subnets[Private Subnets]
         NAT[NAT Gateway]
         CW[CloudWatch]
     end
-    
+
     FastAPI_ALB --> FastAPI_TG
     FastAPI_TG --> FastAPI_ECS
     FastAPI_ECS --> FastAPI_ECR
     FastAPI_ECS --> FastAPI_Scale
-    
+
     MCP_ALB --> MCP_TG
     MCP_TG --> MCP_ECS
     MCP_ECS --> MCP_ECR
     MCP_ECS --> MCP_Scale
-    
+
     FastAPI_ECS -.-> VPC
     MCP_ECS -.-> VPC
     VPC --> Subnets
@@ -215,26 +215,26 @@ graph TB
 ```mermaid
 graph TB
     Start[Run deploy.sh] --> BuildAll[Build Both Images]
-    
+
     BuildAll --> BuildFastAPI[Build FastAPI Image]
     BuildAll --> BuildMCP[Build MCP Image]
-    
+
     BuildFastAPI --> PushFastAPI[Push to ECR FastAPI]
     BuildMCP --> PushMCP[Push to ECR MCP]
-    
+
     PushFastAPI --> TF[Terraform Apply]
     PushMCP --> TF
-    
+
     TF --> CreateInfra[Create Shared Infrastructure]
     CreateInfra --> CreateFastAPI[Deploy FastAPI Service]
     CreateInfra --> CreateMCP[Deploy MCP Service]
-    
+
     CreateFastAPI --> HealthFastAPI[Health Check FastAPI]
     CreateMCP --> HealthMCP[Health Check MCP]
-    
+
     HealthFastAPI --> Ready[Deployment Complete]
     HealthMCP --> Ready
-    
+
     style BuildFastAPI fill:#90EE90
     style BuildMCP fill:#87CEEB
     style CreateFastAPI fill:#90EE90
@@ -246,19 +246,19 @@ graph TB
 ```mermaid
 graph LR
     Start[Run redeploy.sh] --> Check{Service Specified?}
-    
+
     Check -->|No| Both[Redeploy Both]
     Check -->|fastapi| FastAPI[Redeploy FastAPI Only]
     Check -->|mcp| MCP[Redeploy MCP Only]
-    
+
     Both --> BuildBoth[Build Both Images]
     FastAPI --> BuildFastAPI[Build FastAPI Image]
     MCP --> BuildMCP[Build MCP Image]
-    
+
     BuildBoth --> UpdateBoth[Update Both ECS Services]
     BuildFastAPI --> UpdateFastAPI[Update FastAPI ECS]
     BuildMCP --> UpdateMCP[Update MCP ECS]
-    
+
     UpdateBoth --> Done[Complete]
     UpdateFastAPI --> Done
     UpdateMCP --> Done

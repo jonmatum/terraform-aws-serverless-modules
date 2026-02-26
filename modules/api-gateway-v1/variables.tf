@@ -8,12 +8,6 @@ variable "vpc_link_subnet_ids" {
   type        = list(string)
 }
 
-variable "alb_listener_arn" {
-  description = "ARN of the ALB listener for VPC Link integration (optional, for OpenAPI mode)"
-  type        = string
-  default     = null
-}
-
 variable "alb_arn" {
   description = "ARN of the ALB to attach to NLB (required when using OpenAPI mode with ALB)"
   type        = string

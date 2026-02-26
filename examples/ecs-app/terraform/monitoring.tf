@@ -26,14 +26,14 @@ module "cloudwatch_alarms" {
   count  = var.enable_alarms ? 1 : 0
   source = "../../../modules/cloudwatch-alarms"
 
-  cluster_name              = module.ecs.cluster_name
-  service_name              = module.ecs.service_name
-  alb_arn_suffix            = module.alb.alb_arn_suffix
-  target_group_arn_suffix   = module.alb.target_group_arn_suffix
-  sns_topic_arn             = var.alarm_sns_topic_arn
-  cpu_threshold             = 80
-  memory_threshold          = 80
-  target_response_time      = 1
+  cluster_name            = module.ecs.cluster_name
+  service_name            = module.ecs.service_name
+  alb_arn_suffix          = module.alb.alb_arn_suffix
+  target_group_arn_suffix = module.alb.target_group_arn_suffix
+  sns_topic_arn           = var.alarm_sns_topic_arn
+  cpu_threshold           = 80
+  memory_threshold        = 80
+  target_response_time    = 1
 
   tags = var.tags
 }

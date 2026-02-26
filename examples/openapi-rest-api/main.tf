@@ -91,7 +91,7 @@ for path, methods in spec.get('paths', {}).items():
                 if 'content' in response and 'application/json' in response['content']:
                     schema = convert_refs(response['content']['application/json'].get('schema', {}))
                     swagger['paths'][path][method]['responses'][status]['schema'] = schema
-            
+
             if 'requestBody' in details:
                 swagger['paths'][path][method]['consumes'] = ['application/json']
                 schema = convert_refs(details['requestBody']['content']['application/json']['schema'])

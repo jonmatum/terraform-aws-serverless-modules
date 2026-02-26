@@ -227,7 +227,7 @@ aws elbv2 describe-target-health \
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.33.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.34.0 |
 
 ## Modules
 
@@ -276,6 +276,7 @@ aws elbv2 describe-target-health \
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | ECS cluster name |
 | <a name="output_dynamodb_table_name"></a> [dynamodb\_table\_name](#output\_dynamodb\_table\_name) | DynamoDB table name |
 | <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | ECR repository URL |
+| <a name="output_ecs_cluster_name"></a> [ecs\_cluster\_name](#output\_ecs\_cluster\_name) | ECS cluster name |
 | <a name="output_s3_bucket_name"></a> [s3\_bucket\_name](#output\_s3\_bucket\_name) | S3 bucket name for React app deployment |
 | <a name="output_service_name"></a> [service\_name](#output\_service\_name) | ECS service name |
 | <a name="output_test_commands"></a> [test\_commands](#output\_test\_commands) | Commands to test the API |

@@ -107,12 +107,12 @@ async def create_item(item: ItemCreate):
             "created_at": timestamp,
             "updated_at": timestamp
         }
-        
+
         # Convert float to Decimal for DynamoDB
         item_data["price"] = Decimal(str(item_data["price"]))
 
         table.put_item(Item=item_data)
-        
+
         # Convert back to float for response
         item_data["price"] = float(item_data["price"])
         return Item(**item_data)
@@ -183,7 +183,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
             return Item(**decimal_to_float(response['Item']))
 
         update_data["updated_at"] = datetime.utcnow().isoformat() + "Z"
-        
+
         # Convert float to Decimal for DynamoDB
         if "price" in update_data:
             update_data["price"] = Decimal(str(update_data["price"]))

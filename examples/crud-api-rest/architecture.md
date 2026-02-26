@@ -9,27 +9,27 @@ graph TB
     subgraph "Client"
         Browser[Web Browser]
     end
-    
+
     subgraph "Frontend - CloudFront + S3"
         CF[CloudFront Distribution]
         S3[S3 Bucket<br/>React App]
     end
-    
+
     subgraph "Backend - API Gateway REST API"
         APIGW[API Gateway REST API v1<br/>Swagger/OpenAPI]
         VPCLink[VPC Link]
     end
-    
+
     subgraph "Private Network"
         NLB[Network Load Balancer<br/>Required for REST API]
         ALB[Application Load Balancer]
         ECS[ECS Fargate<br/>FastAPI Backend]
     end
-    
+
     subgraph "Data Layer"
         DDB[DynamoDB<br/>Items Table]
     end
-    
+
     Browser -->|Static Assets| CF
     CF --> S3
     Browser -->|API Calls| APIGW
@@ -51,7 +51,7 @@ sequenceDiagram
     participant ALB
     participant ECS as FastAPI
     participant DDB as DynamoDB
-    
+
     Note over Client,DDB: CREATE Operation
     Client->>APIGW: POST /items
     APIGW->>VPCLink: Forward Request
@@ -61,7 +61,7 @@ sequenceDiagram
     ECS->>DDB: PutItem
     DDB->>ECS: Success
     ECS->>Client: 201 Created
-    
+
     Note over Client,DDB: READ Operation
     Client->>APIGW: GET /items/{id}
     APIGW->>VPCLink: Forward Request
@@ -71,7 +71,7 @@ sequenceDiagram
     ECS->>DDB: GetItem
     DDB->>ECS: Item Data
     ECS->>Client: 200 OK + Data
-    
+
     Note over Client,DDB: UPDATE Operation
     Client->>APIGW: PUT /items/{id}
     APIGW->>VPCLink: Forward Request
@@ -81,7 +81,7 @@ sequenceDiagram
     ECS->>DDB: UpdateItem
     DDB->>ECS: Success
     ECS->>Client: 200 OK
-    
+
     Note over Client,DDB: DELETE Operation
     Client->>APIGW: DELETE /items/{id}
     APIGW->>VPCLink: Forward Request
@@ -103,7 +103,7 @@ graph TB
         PubSub[Public Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "API Gateway v1 Module"
         APIGW[REST API]
         Swagger[Swagger Spec]
@@ -111,38 +111,38 @@ graph TB
         Deployment[API Deployment]
         Stage[API Stage]
     end
-    
+
     subgraph "Network Load Balancer"
         NLB[NLB<br/>Required for REST API]
         NLBListener[NLB Listener]
         NLBTarget[NLB Target Group]
     end
-    
+
     subgraph "Application Load Balancer"
         ALB[ALB]
         ALBListener[ALB Listener]
         ALBTarget[ALB Target Group]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service]
         TaskDef[Task Definition<br/>FastAPI]
         AutoScale[Auto Scaling]
     end
-    
+
     subgraph "DynamoDB Module"
         Table[DynamoDB Table]
         GSI[Global Secondary Index]
         Backup[Point-in-Time Recovery]
     end
-    
+
     subgraph "CloudFront + S3"
         CF[CloudFront Distribution]
         S3Bucket[S3 Bucket]
         OAC[Origin Access Control]
     end
-    
+
     APIGW --> Swagger
     APIGW --> VPCLink
     VPCLink --> NLB
@@ -166,7 +166,7 @@ graph TB
     Start[Run deploy.sh] --> BuildBackend[Build FastAPI Image]
     BuildBackend --> PushECR[Push to ECR]
     PushECR --> TFApply[Terraform Apply]
-    
+
     TFApply --> CreateVPC[Create VPC]
     CreateVPC --> CreateDDB[Create DynamoDB]
     CreateDDB --> CreateECS[Create ECS Service]
@@ -175,7 +175,7 @@ graph TB
     CreateNLB --> CreateVPCLink[Create VPC Link]
     CreateVPCLink --> CreateAPIGW[Create API Gateway]
     CreateAPIGW --> HealthCheck[Health Check Backend]
-    
+
     HealthCheck --> BuildFrontend[Build React App]
     BuildFrontend --> CreateS3[Create S3 Bucket]
     CreateS3 --> UploadAssets[Upload React Assets]

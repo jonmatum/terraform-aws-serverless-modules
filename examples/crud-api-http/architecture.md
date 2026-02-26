@@ -9,26 +9,26 @@ graph TB
     subgraph "Client"
         Browser[Web Browser]
     end
-    
+
     subgraph "Frontend - CloudFront + S3"
         CF[CloudFront Distribution]
         S3[S3 Bucket<br/>React App]
     end
-    
+
     subgraph "Backend - API Gateway HTTP API"
         APIGW[API Gateway HTTP API v2<br/>OpenAPI 3.0]
         VPCLink[VPC Link]
     end
-    
+
     subgraph "Private Network"
         ALB[Application Load Balancer<br/>Direct Integration]
         ECS[ECS Fargate<br/>FastAPI Backend]
     end
-    
+
     subgraph "Data Layer"
         DDB[DynamoDB<br/>Items Table]
     end
-    
+
     Browser -->|Static Assets| CF
     CF --> S3
     Browser -->|API Calls| APIGW
@@ -47,21 +47,21 @@ graph LR
         VPCLink2[VPC Link]
         ALB2[ALB Direct]
     end
-    
+
     subgraph "REST API v1 - Alternative"
         APIGW1[API Gateway REST]
         VPCLink1[VPC Link]
         NLB1[NLB Required]
         ALB1[ALB]
     end
-    
+
     APIGW2 --> VPCLink2
     VPCLink2 --> ALB2
-    
+
     APIGW1 --> VPCLink1
     VPCLink1 --> NLB1
     NLB1 --> ALB1
-    
+
     style NLB1 fill:#ff6b6b
     style ALB2 fill:#90EE90
 ```
@@ -76,7 +76,7 @@ sequenceDiagram
     participant ALB
     participant ECS as FastAPI
     participant DDB as DynamoDB
-    
+
     Note over Client,DDB: CREATE Operation
     Client->>APIGW: POST /items
     APIGW->>VPCLink: Forward Request
@@ -85,7 +85,7 @@ sequenceDiagram
     ECS->>DDB: PutItem
     DDB->>ECS: Success
     ECS->>Client: 201 Created
-    
+
     Note over Client,DDB: READ Operation
     Client->>APIGW: GET /items/{id}
     APIGW->>VPCLink: Forward Request
@@ -106,38 +106,38 @@ graph TB
         PubSub[Public Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "API Gateway v2 Module"
         APIGW[HTTP API]
         VPCLink[VPC Link]
         Routes[Routes]
         Integration[ALB Integration]
     end
-    
+
     subgraph "Application Load Balancer"
         ALB[ALB]
         ALBListener[ALB Listener]
         ALBTarget[ALB Target Group]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service]
         TaskDef[Task Definition<br/>FastAPI]
         AutoScale[Auto Scaling]
     end
-    
+
     subgraph "DynamoDB Module"
         Table[DynamoDB Table]
         Backup[Point-in-Time Recovery]
     end
-    
+
     subgraph "CloudFront + S3"
         CF[CloudFront Distribution]
         S3Bucket[S3 Bucket]
         OAC[Origin Access Control]
     end
-    
+
     APIGW --> VPCLink
     VPCLink --> ALB
     ALB --> ALBListener

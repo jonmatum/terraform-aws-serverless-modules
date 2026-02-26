@@ -9,21 +9,21 @@ graph TB
     subgraph "Client"
         User[API Client]
     end
-    
+
     subgraph "API Gateway HTTP API"
         APIGW[API Gateway HTTP API v2<br/>OpenAPI 3.0]
         VPCLink[VPC Link]
     end
-    
+
     subgraph "Private Network"
         NLB[Network Load Balancer]
         ECS[ECS Fargate<br/>FastAPI App]
     end
-    
+
     subgraph "Schema"
         OpenAPI[OpenAPI 3.0 Schema<br/>Auto-generated]
     end
-    
+
     User --> APIGW
     APIGW --> VPCLink
     VPCLink --> NLB
@@ -40,14 +40,14 @@ sequenceDiagram
     participant Docker
     participant Terraform
     participant APIGW as API Gateway
-    
+
     Note over FastAPI,APIGW: Deployment Time
     FastAPI->>Docker: Generate OpenAPI Schema
     Docker->>Terraform: Export openapi.json
     Terraform->>APIGW: Import Schema
     APIGW->>APIGW: Create Routes
     APIGW->>APIGW: Configure Integrations
-    
+
     Note over FastAPI,APIGW: Runtime
     Client->>APIGW: API Request
     APIGW->>APIGW: Validate Against Schema
@@ -65,30 +65,30 @@ graph TB
         PrivSub[Private Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "API Gateway Module"
         APIGW[HTTP API v2]
         Schema[OpenAPI 3.0 Import]
         VPCLink[VPC Link]
         Routes[Auto-generated Routes]
     end
-    
+
     subgraph "Network Load Balancer"
         NLB[NLB]
         NLBListener[NLB Listener]
         NLBTarget[NLB Target Group]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service<br/>FastAPI]
         TaskDef[Task Definition]
     end
-    
+
     subgraph "ECR Module"
         ECR[ECR Repository]
     end
-    
+
     Schema --> APIGW
     APIGW --> Routes
     APIGW --> VPCLink
@@ -107,14 +107,14 @@ sequenceDiagram
     participant Client
     participant APIGW as API Gateway
     participant ECS as FastAPI
-    
+
     Note over Client,ECS: Valid Request
     Client->>APIGW: POST /users {valid data}
     APIGW->>APIGW: Validate Against OpenAPI
     APIGW->>ECS: Forward Request
     ECS->>APIGW: 201 Created
     APIGW->>Client: 201 Created
-    
+
     Note over Client,ECS: Invalid Request
     Client->>APIGW: POST /users {invalid data}
     APIGW->>APIGW: Validate Against OpenAPI

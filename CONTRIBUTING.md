@@ -28,7 +28,7 @@ pre-commit install
    ```bash
    # Run all hooks
    pre-commit run --all-files
-   
+
    # Or run specific hooks
    pre-commit run terraform_fmt --all-files
    pre-commit run terraform_docs --all-files
@@ -38,7 +38,7 @@ pre-commit install
    ```bash
    # Test all modules
    ./scripts/test-modules.sh
-   
+
    # Test specific example
    cd examples/your-example
    ./deploy.sh

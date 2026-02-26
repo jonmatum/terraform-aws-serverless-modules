@@ -9,22 +9,22 @@ graph TB
     subgraph "Client"
         User[API Client]
     end
-    
+
     subgraph "API Gateway REST API"
         APIGW[API Gateway REST API v1<br/>Swagger 2.0]
         VPCLink[VPC Link]
     end
-    
+
     subgraph "Private Network"
         NLB[Network Load Balancer<br/>Required for REST API]
         ECS[ECS Fargate<br/>FastAPI App]
     end
-    
+
     subgraph "Schema"
         OpenAPI[OpenAPI 3.0 Schema]
         Swagger[Swagger 2.0 Conversion]
     end
-    
+
     User --> APIGW
     APIGW --> VPCLink
     VPCLink --> NLB
@@ -43,7 +43,7 @@ sequenceDiagram
     participant Converter
     participant Terraform
     participant APIGW as API Gateway
-    
+
     Note over FastAPI,APIGW: Deployment Time
     FastAPI->>Docker: Generate OpenAPI 3.0
     Docker->>Converter: Export openapi.json
@@ -52,7 +52,7 @@ sequenceDiagram
     APIGW->>APIGW: Create Resources
     APIGW->>APIGW: Create Methods
     APIGW->>APIGW: Configure Integrations
-    
+
     Note over FastAPI,APIGW: Runtime
     Client->>APIGW: API Request
     APIGW->>APIGW: Validate Against Swagger
@@ -70,7 +70,7 @@ graph TB
         PrivSub[Private Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "API Gateway v1 Module"
         APIGW[REST API]
         Swagger[Swagger 2.0 Import]
@@ -78,23 +78,23 @@ graph TB
         Resources[Auto-generated Resources]
         Methods[Auto-generated Methods]
     end
-    
+
     subgraph "Network Load Balancer"
         NLB[NLB<br/>Required for REST API]
         NLBListener[NLB Listener]
         NLBTarget[NLB Target Group]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service<br/>FastAPI]
         TaskDef[Task Definition]
     end
-    
+
     subgraph "ECR Module"
         ECR[ECR Repository]
     end
-    
+
     Swagger --> APIGW
     APIGW --> Resources
     APIGW --> Methods
@@ -114,22 +114,22 @@ graph LR
     subgraph "FastAPI Output"
         OA3[OpenAPI 3.0<br/>Modern Spec]
     end
-    
+
     subgraph "Conversion"
         Convert[Schema Converter<br/>3.0 → 2.0]
     end
-    
+
     subgraph "API Gateway Input"
         Swagger[Swagger 2.0<br/>Legacy Spec]
     end
-    
+
     OA3 --> Convert
     Convert --> Swagger
-    
+
     Note1[Components → Definitions]
     Note2[requestBody → parameters]
     Note3[servers → host + basePath]
-    
+
     style Note1 fill:#f9f9f9
     style Note2 fill:#f9f9f9
     style Note3 fill:#f9f9f9

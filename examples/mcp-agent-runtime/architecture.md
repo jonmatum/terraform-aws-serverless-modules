@@ -9,25 +9,25 @@ graph TB
     subgraph "Client"
         Agent[AI Agent/Client]
     end
-    
+
     subgraph "AWS Bedrock AgentCore"
         Gateway[AgentCore Gateway<br/>IAM Authentication]
     end
-    
+
     subgraph "Public Subnet"
         ALB[Application Load Balancer<br/>HTTPS Required]
     end
-    
+
     subgraph "Private Subnet"
         ECS1[ECS Task 1<br/>MCP Server]
         ECS2[ECS Task 2<br/>MCP Server]
     end
-    
+
     subgraph "Services"
         ECR[ECR Repository<br/>MCP Server Image]
         CW[CloudWatch<br/>Logs & Metrics]
     end
-    
+
     Agent --> Gateway
     Gateway -.->|Requires HTTPS| ALB
     ALB --> ECS1
@@ -46,7 +46,7 @@ sequenceDiagram
     participant Gateway as AgentCore Gateway
     participant ALB
     participant ECS as MCP Server
-    
+
     Agent->>Gateway: MCP Request + IAM Auth
     Gateway->>Gateway: Validate IAM Credentials
     Gateway->>ALB: Forward to HTTPS Endpoint
@@ -68,35 +68,35 @@ graph TB
         PrivSub[Private Subnets]
         NAT[NAT Gateway]
     end
-    
+
     subgraph "ECR Module"
         ECR[ECR Repository]
         Lifecycle[Lifecycle Policy]
     end
-    
+
     subgraph "ALB Module"
         ALB[Application LB<br/>HTTPS Listener]
         TG[Target Group]
         Cert[ACM Certificate]
     end
-    
+
     subgraph "ECS Module"
         Cluster[ECS Cluster]
         Service[ECS Service<br/>MCP Server]
         TaskDef[Task Definition]
         AutoScale[Auto Scaling<br/>2-4 tasks]
     end
-    
+
     subgraph "AgentCore"
         Gateway[AgentCore Gateway]
         Target[Gateway Target<br/>HTTPS Endpoint]
     end
-    
+
     subgraph "Monitoring"
         CWLogs[CloudWatch Logs]
         CWAlarms[CloudWatch Alarms]
     end
-    
+
     ALB --> TG
     TG --> Service
     Service --> TaskDef

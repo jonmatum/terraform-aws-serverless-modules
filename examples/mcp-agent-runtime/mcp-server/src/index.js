@@ -105,7 +105,7 @@ app.post('/mcp', async (req, res) => {
     const response = await server.request(request, {});
     res.json(response);
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       jsonrpc: '2.0',
       error: {
         code: -32603,

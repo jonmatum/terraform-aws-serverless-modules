@@ -12,39 +12,39 @@ graph TB
         APIGW[API Gateway]
         AGENTGW[Agent Gateway]
     end
-    
+
     subgraph "Private Subnet"
         ECS[ECS Fargate Tasks]
         LAMBDA[Lambda Functions]
         AGENTRT[Agent Runtime]
     end
-    
+
     subgraph "Data Layer"
         DDB[DynamoDB]
         RDS[RDS Database]
         ECR[ECR Repository]
     end
-    
+
     subgraph "Messaging & Queues"
         SQS[SQS Queue]
         SNS[SNS Topic]
     end
-    
+
     subgraph "Orchestration"
         SF[Step Functions]
     end
-    
+
     subgraph "AI/ML Services"
         BEDROCK[Amazon Bedrock]
         AGENTCORE[Bedrock AgentCore]
     end
-    
+
     subgraph "Security & Monitoring"
         WAF[AWS WAF]
         CW[CloudWatch]
         SM[Secrets Manager]
     end
-    
+
     Internet((Internet)) --> WAF
     WAF --> ALB
     WAF --> APIGW
@@ -76,7 +76,7 @@ graph TB
     LAMBDA -.-> CW
     SF -.-> CW
     AGENTRT -.-> CW
-    
+
     style ALB fill:#FF9900
     style ECS fill:#FF9900
     style DDB fill:#FF9900
