@@ -91,7 +91,7 @@ Model Context Protocol (MCP) server with Bedrock AgentCore Gateway. Advanced top
 - Internal ALB with private ECS
 - Auto-scaling and Spot instances
 
-**⚠️ Requires**: AWS Provider >= 6.18.0
+** Requires**: AWS Provider >= 6.18.0
 
 ## Quick Start
 
@@ -107,14 +107,14 @@ cd <example-directory>
 
 | Feature | HTTP API (v2) | REST API (v1) |
 |---------|---------------|---------------|
-| **Cost** | ✅ $1.00/million | ❌ $3.50/million |
-| **VPC Integration** | ✅ Direct to ALB | ❌ Requires NLB |
-| **Latency** | ✅ Lower | ⚠️ Higher (extra hop) |
-| **OpenAPI** | ✅ Yes | ✅ Yes |
-| **CORS** | ✅ Built-in | ✅ Manual config |
-| **API Keys** | ❌ No | ✅ Yes |
-| **Usage Plans** | ❌ No | ✅ Yes |
-| **Request Validation** | ❌ Limited | ✅ Full |
+| **Cost** |  $1.00/million |  $3.50/million |
+| **VPC Integration** |  Direct to ALB |  Requires NLB |
+| **Latency** |  Lower |  Higher (extra hop) |
+| **OpenAPI** |  Yes |  Yes |
+| **CORS** |  Built-in |  Manual config |
+| **API Keys** |  No |  Yes |
+| **Usage Plans** |  No |  Yes |
+| **Request Validation** |  Limited |  Full |
 
 **Recommendation**: Use HTTP API (v2) unless you need API keys or usage plans.
 

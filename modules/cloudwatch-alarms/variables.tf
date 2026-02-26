@@ -11,13 +11,13 @@ variable "service_name" {
 variable "alb_arn_suffix" {
   description = "ALB ARN suffix for metrics"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "target_group_arn_suffix" {
   description = "Target group ARN suffix for metrics"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "sns_topic_arn" {

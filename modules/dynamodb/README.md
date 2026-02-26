@@ -2,11 +2,23 @@
 
 DynamoDB table module with configurable capacity and indexes.
 
+## Features
+
+- DynamoDB table with on-demand or provisioned capacity
+- Point-in-time recovery (PITR)
+- Encryption at rest with KMS
+- Global secondary indexes (GSI)
+- Local secondary indexes (LSI)
+- Auto-scaling for provisioned capacity
+- Stream configuration
+- TTL support
+
 ## Usage
 
 ```hcl
 module "dynamodb" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/dynamodb?ref=modules/dynamodb/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/dynamodb"
+  version = "2.0.1"
 
   table_name     = "my-table"
   hash_key       = "id"
@@ -18,6 +30,15 @@ module "dynamodb" {
       type = "S"
     }
   ]
+}
+```
+
+## Examples
+
+- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with DynamoDB
+- [crud-api-http](../../examples/crud-api-http/) - HTTP API with DynamoDB
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
   tags = {
     Environment = "production"

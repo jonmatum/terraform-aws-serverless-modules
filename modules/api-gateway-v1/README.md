@@ -2,6 +2,17 @@
 
 API Gateway REST API (v1) module with VPC Link and NLB support.
 
+## Features
+
+- API Gateway REST API (v1) with full feature set
+- VPC Link for private integrations (requires NLB)
+- OpenAPI/Swagger specification support
+- API keys and usage plans
+- Request/response validation
+- Request/response transformation
+- Custom authorizers (Lambda, Cognito)
+- CloudWatch logging and X-Ray tracing
+
 ## Architecture
 
 API Gateway REST API v1 requires NLB for VPC Link integration (AWS limitation).
@@ -15,6 +26,26 @@ API Gateway → VPC Link → NLB → ALB → Backend
 ```
 API Gateway → VPC Link → NLB → Backend
 ```
+
+## Usage
+
+```hcl
+module "api_gateway_rest" {
+  source  = "jonmatum/serverless-modules/aws//modules/api-gateway-v1"
+  version = "2.0.1"
+
+  name        = "my-rest-api"
+  description = "My REST API"
+  
+  # OpenAPI specification
+  openapi_spec = file("${path.module}/openapi.json")
+}
+```
+
+## Examples
+
+- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with REST API
+- [rest-api-service](../../examples/rest-api-service/) - REST API service
 
 ## Well-Architected Considerations
 

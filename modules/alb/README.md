@@ -2,11 +2,22 @@
 
 Application Load Balancer module for ECS services.
 
+## Features
+
+- Application Load Balancer with HTTP/HTTPS listeners
+- Target group with health checks
+- S3 bucket for access logs with lifecycle policies
+- Security group with configurable ingress rules
+- SSL/TLS certificate support
+- Connection draining configuration
+- Sticky sessions support
+
 ## Usage
 
 ```hcl
 module "alb" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/alb?ref=modules/alb/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/alb"
+  version = "2.0.1"
 
   name              = "my-alb"
   vpc_id            = "vpc-xxxxx"
@@ -15,6 +26,12 @@ module "alb" {
   health_check_path = "/health"
 }
 ```
+
+## Examples
+
+- [ecs-app](../../examples/ecs-app/) - Basic ECS application with ALB
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service with ALB
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 

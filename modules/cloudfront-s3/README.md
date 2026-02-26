@@ -2,11 +2,23 @@
 
 CloudFront distribution with S3 origin for static website hosting.
 
+## Features
+
+- CloudFront distribution with S3 origin
+- Origin Access Control (OAC) for secure S3 access
+- Custom domain support with ACM certificates
+- SPA routing with custom error responses
+- Gzip/Brotli compression
+- Cache behavior configuration
+- WAF integration support
+- Access logging
+
 ## Usage
 
 ```hcl
 module "cloudfront_s3" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/cloudfront-s3?ref=modules/cloudfront-s3/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/cloudfront-s3"
+  version = "2.0.1"
 
   bucket_name = "my-static-website"
   domain_name = "example.com"
@@ -16,6 +28,11 @@ module "cloudfront_s3" {
   }
 }
 ```
+
+## Examples
+
+- [crud-api-rest](../../examples/crud-api-rest/) - React frontend with CloudFront
+- [crud-api-http](../../examples/crud-api-http/) - React frontend with CloudFront
 
 ## Features
 

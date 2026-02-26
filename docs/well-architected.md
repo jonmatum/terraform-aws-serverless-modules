@@ -2,7 +2,7 @@
 
 This document outlines how our Terraform modules implement AWS Well-Architected Framework best practices.
 
-## Security Pillar ✅
+## Security Pillar 
 
 ### Encryption
 - **ECR**: Encryption at rest enabled by default (AES256, optional KMS)
@@ -23,7 +23,7 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 - SSM Parameter Store integration
 - No hardcoded credentials in container definitions
 
-## Reliability Pillar ✅
+## Reliability Pillar 
 
 ### High Availability
 - Multi-AZ NAT gateways by default (configurable for dev)
@@ -45,7 +45,7 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 - ALB 5XX error monitoring
 - Unhealthy host count tracking
 
-## Operational Excellence Pillar ✅
+## Operational Excellence Pillar 
 
 ### Observability
 - Container Insights enabled by default
@@ -63,7 +63,7 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 - Optional SNS notifications
 - ALB and ECS service metrics
 
-## Performance Efficiency Pillar ✅
+## Performance Efficiency Pillar 
 
 ### Compute Optimization
 - Fargate serverless compute
@@ -79,7 +79,7 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 - Ready for CloudFront integration
 - API Gateway caching support
 
-## Cost Optimization Pillar ✅
+## Cost Optimization Pillar 
 
 ### Resource Optimization
 - VPC endpoints reduce data transfer costs
@@ -96,7 +96,7 @@ This document outlines how our Terraform modules implement AWS Well-Architected 
 - Resource-level cost tracking
 - S3 lifecycle policies for log retention
 
-## Sustainability Pillar ✅
+## Sustainability Pillar 
 
 ### Resource Efficiency
 - Auto-scaling reduces idle resources
@@ -237,31 +237,31 @@ module "ecs" {
 ## Default Behaviors
 
 ### Security Defaults
-- ✅ ECR encryption enabled (AES256)
-- ✅ ECR image scanning on push
-- ✅ ALB access logs enabled
-- ✅ VPC endpoints enabled
-- ✅ Security groups with specific ports
+-  ECR encryption enabled (AES256)
+-  ECR image scanning on push
+-  ALB access logs enabled
+-  VPC endpoints enabled
+-  Security groups with specific ports
 
 ### Reliability Defaults
-- ✅ Container Insights enabled
-- ✅ Auto-scaling enabled (1-4 tasks)
-- ✅ Multi-AZ NAT gateways
-- ✅ Health check grace period: 60s
-- ✅ Connection draining: 30s
+-  Container Insights enabled
+-  Auto-scaling enabled (1-4 tasks)
+-  Multi-AZ NAT gateways
+-  Health check grace period: 60s
+-  Connection draining: 30s
 
 ### Cost Optimization Defaults
-- ✅ ECR lifecycle policy (keep 10 images)
-- ✅ S3 log retention: 90 days
-- ✅ CloudWatch log retention: 30 days
-- ⚠️ Fargate Spot: disabled (opt-in)
-- ⚠️ Single NAT: disabled (opt-in for dev)
+-  ECR lifecycle policy (keep 10 images)
+-  S3 log retention: 90 days
+-  CloudWatch log retention: 30 days
+-  Fargate Spot: disabled (opt-in)
+-  Single NAT: disabled (opt-in for dev)
 
 ---
 
 ## Compliance & Best Practices
 
-### ✅ Implemented
+###  Implemented
 - Encryption at rest and in transit
 - Least privilege IAM policies
 - Network segmentation
@@ -271,7 +271,7 @@ module "ecs" {
 - Lifecycle management
 - High availability
 
-### 🔄 Optional Enhancements
+###  Optional Enhancements
 - WAF integration (add WAF module)
 - CloudFront CDN (add CloudFront module)
 - X-Ray tracing (add X-Ray sidecar)

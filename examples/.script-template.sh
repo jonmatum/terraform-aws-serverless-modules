@@ -1,13 +1,16 @@
 #!/bin/bash
 set -e
 
+# Standard deployment script template
+# Usage: ./deploy.sh
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 AWS_REGION=${AWS_REGION:-us-east-1}
 IMAGE_TAG=${IMAGE_TAG:-latest}
 
-echo "=== REST API Service Deployment ==="
+echo "=== [Project Name] Deployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
 echo ""
@@ -51,6 +54,19 @@ docker push $ECR_URL:$IMAGE_TAG
 echo ""
 echo "Step 5: Deploying infrastructure..."
 terraform apply -auto-approve
+
+# Step 6: Force ECS service update
+echo ""
+echo "Step 6: Forcing ECS service update..."
+CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)
+SERVICE_NAME=$(terraform output -raw ecs_service_name)
+
+aws ecs update-service \
+  --cluster $CLUSTER_NAME \
+  --service $SERVICE_NAME \
+  --force-new-deployment \
+  --region $AWS_REGION \
+  --no-cli-pager > /dev/null
 
 echo ""
 echo "=== Deployment Complete ==="

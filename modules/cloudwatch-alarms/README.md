@@ -2,15 +2,35 @@
 
 CloudWatch alarms module for monitoring AWS resources.
 
+## Features
+
+- ECS service alarms (CPU, memory, task count)
+- ALB alarms (response time, error rates, unhealthy targets)
+- API Gateway alarms (4XX, 5XX errors, latency)
+- DynamoDB alarms (throttling, errors)
+- Customizable thresholds and evaluation periods
+- SNS topic integration for notifications
+
 ## Usage
 
 ```hcl
 module "cloudwatch_alarms" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/cloudwatch-alarms?ref=modules/cloudwatch-alarms/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/cloudwatch-alarms"
+  version = "2.0.1"
 
-  # Add your configuration here
+  ecs_cluster_name = "my-cluster"
+  ecs_service_name = "my-service"
+  alb_arn_suffix   = "app/my-alb/1234567890"
+  
+  alarm_actions = [aws_sns_topic.alerts.arn]
 }
 ```
+
+## Examples
+
+- [ecs-app](../../examples/ecs-app/) - ECS monitoring
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service monitoring
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 

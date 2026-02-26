@@ -10,6 +10,12 @@ variable "project_name" {
   default     = "mcp-agent"
 }
 
+variable "certificate_arn" {
+  description = "ACM certificate ARN for HTTPS listener (required for AgentCore Gateway Target)"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)

@@ -2,11 +2,22 @@
 
 VPC module with public and private subnets, NAT gateway, and routing.
 
+## Features
+
+- Multi-AZ VPC with public and private subnets
+- NAT Gateway for private subnet internet access
+- Internet Gateway for public subnets
+- VPC Endpoints for AWS services (ECR, S3, CloudWatch, Secrets Manager)
+- Configurable single or multi-AZ NAT Gateway
+- Flow logs support
+- Customizable CIDR blocks
+
 ## Usage
 
 ```hcl
 module "vpc" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/vpc?ref=modules/vpc/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/vpc"
+  version = "2.0.1"
 
   name               = "my-vpc"
   cidr               = "10.0.0.0/16"
@@ -17,6 +28,12 @@ module "vpc" {
   single_nat_gateway = true
 }
 ```
+
+## Examples
+
+- [ecs-app](../../examples/ecs-app/) - Basic ECS application with VPC
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service architecture
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 

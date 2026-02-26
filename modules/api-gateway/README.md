@@ -2,11 +2,23 @@
 
 API Gateway HTTP API (v2) module with VPC Link support.
 
+## Features
+
+- API Gateway HTTP API (v2) with lower cost and latency
+- VPC Link for private integrations
+- CORS configuration
+- Custom domain support
+- JWT authorizers
+- Throttling and rate limiting
+- CloudWatch logging
+- X-Ray tracing
+
 ## Usage
 
 ```hcl
 module "api_gateway" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/api-gateway?ref=modules/api-gateway/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/api-gateway"
+  version = "2.0.1"
 
   name                        = "my-api"
   vpc_link_subnet_ids         = ["subnet-xxxxx", "subnet-yyyyy"]
@@ -18,6 +30,17 @@ module "api_gateway" {
       route_key       = "ANY /api/{proxy+}"
       connection_type = "VPC_LINK"
       uri             = "http://internal-alb.local"
+    }
+  }
+}
+```
+
+## Examples
+
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service architecture
+- [crud-api-http](../../examples/crud-api-http/) - CRUD API with HTTP API
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
     }
   }
 }

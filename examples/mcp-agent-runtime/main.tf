@@ -229,6 +229,8 @@ resource "aws_bedrockagentcore_gateway" "mcp" {
 
 # AgentCore Gateway Target (MCP Server on ALB)
 resource "aws_bedrockagentcore_gateway_target" "mcp_server" {
+  count = var.certificate_arn != "" ? 1 : 0
+
   gateway_identifier = aws_bedrockagentcore_gateway.mcp.gateway_id
   name               = "${var.project_name}-mcp-server"
   description        = "MCP Server running on ECS Fargate"
@@ -236,7 +238,7 @@ resource "aws_bedrockagentcore_gateway_target" "mcp_server" {
   target_configuration {
     mcp {
       mcp_server {
-        endpoint = "http://${module.alb.alb_dns_name}"
+        endpoint = "https://${module.alb.alb_dns_name}"
       }
     }
   }
@@ -255,6 +257,10 @@ module "alb" {
 
   health_check_path  = "/health"
   enable_access_logs = true
+
+  # HTTPS configuration (optional)
+  certificate_arn = var.certificate_arn
+  enable_https    = var.certificate_arn != ""
 
   tags = var.tags
 }

@@ -10,32 +10,32 @@ IMAGE_TAG=${IMAGE_TAG:-$(git rev-parse --short HEAD 2>/dev/null || date +%s)}
 echo "=== OpenAPI REST API Redeployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
+echo ""
 
 # Get ECR URL
 ECR_URL=$(terraform output -raw ecr_repository_url)
 
-# Login to ECR
-echo ""
-echo "Logging into ECR..."
+# Step 1: Login to ECR
+echo "Step 1: Logging into ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
 
-# Build and push
+# Step 2: Build and push image
 echo ""
-echo "Building image..."
+echo "Step 2: Building image..."
 docker build --platform linux/amd64 -t $ECR_URL:$IMAGE_TAG -t $ECR_URL:latest .
 
 echo "Pushing image..."
 docker push $ECR_URL:$IMAGE_TAG
 docker push $ECR_URL:latest
 
-# Regenerate OpenAPI spec if app changed
+# Step 3: Regenerate OpenAPI spec
 echo ""
-echo "Regenerating OpenAPI spec..."
+echo "Step 3: Regenerating OpenAPI spec..."
 pip3 install -q -r requirements.txt
 
-# Apply terraform to update API Gateway if spec changed
+# Step 4: Update API Gateway
 echo ""
-echo "Updating API Gateway with new spec..."
+echo "Step 4: Updating API Gateway with new spec..."
 terraform apply -auto-approve
 
 echo ""

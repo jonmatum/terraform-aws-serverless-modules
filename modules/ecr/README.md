@@ -2,17 +2,33 @@
 
 Elastic Container Registry module for storing Docker images.
 
+## Features
+
+- ECR repository with encryption at rest
+- Image scanning on push
+- Lifecycle policies for image retention
+- Image tag mutability configuration
+- Cross-region replication support
+- Repository policies for access control
+
 ## Usage
 
 ```hcl
 module "ecr" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/ecr?ref=modules/ecr/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/ecr"
+  version = "2.0.1"
 
   repository_name      = "my-app"
   image_tag_mutability = "MUTABLE"
   scan_on_push         = true
 }
 ```
+
+## Examples
+
+- [ecs-app](../../examples/ecs-app/) - Basic ECS application with ECR
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service with ECR
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 

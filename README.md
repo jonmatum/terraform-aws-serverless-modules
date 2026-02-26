@@ -8,15 +8,59 @@
 
 Terraform modules for deploying serverless and container-based applications on AWS, following AWS Well-Architected Framework best practices.
 
-## Architecture
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Public Subnet"
+        ALB[Application Load Balancer]
+        NAT[NAT Gateway]
+        APIGW[API Gateway]
+    end
+    
+    subgraph "Private Subnet"
+        ECS[ECS Fargate Tasks]
+        LAMBDA[Lambda Functions]
+    end
+    
+    subgraph "Data Layer"
+        DDB[DynamoDB]
+        ECR[ECR Repository]
+    end
+    
+    subgraph "Security & Monitoring"
+        WAF[AWS WAF]
+        CW[CloudWatch]
+        SM[Secrets Manager]
+    end
+    
+    Internet((Internet)) --> WAF
+    WAF --> ALB
+    WAF --> APIGW
+    ALB --> ECS
+    APIGW --> ECS
+    ECS --> DDB
+    ECS --> NAT
+    NAT --> Internet
+    ECS -.-> ECR
+    ECS -.-> SM
+    ECS -.-> CW
+    
+    style ALB fill:#FF9900
+    style ECS fill:#FF9900
+    style DDB fill:#FF9900
+    style APIGW fill:#FF9900
+```
+
+## Well-Architected Framework
 
 Built following [AWS Well-Architected Framework](./docs/well-architected.md) best practices:
 
-- Security: Encryption, least-privilege IAM, VPC endpoints, WAF
-- Reliability: Multi-AZ, auto-scaling, health checks, monitoring
-- Operational Excellence: Container Insights, access logs, alarms
-- Performance: Fargate, VPC endpoints, CloudFront CDN
-- Cost Optimization: Fargate Spot, lifecycle policies, VPC endpoints
+- **Security**: Encryption at rest/transit, least-privilege IAM, VPC endpoints, WAF
+- **Reliability**: Multi-AZ deployment, auto-scaling, health checks, monitoring
+- **Operational Excellence**: Container Insights, access logs, CloudWatch alarms
+- **Performance**: Fargate compute, VPC endpoints, CloudFront CDN
+- **Cost Optimization**: Fargate Spot, lifecycle policies, VPC endpoints
 
 ## Usage from Terraform Registry
 
@@ -35,6 +79,7 @@ module "ecs" {
   
   cluster_name = "my-cluster"
   vpc_id       = module.vpc.vpc_id
+  subnet_ids   = module.vpc.private_subnet_ids
   # ...
 }
 ```
@@ -43,16 +88,16 @@ module "ecs" {
 
 | Module | Description | Key Features |
 |--------|-------------|--------------|
-| **vpc** | Multi-AZ VPC | NAT gateways, VPC endpoints |
-| **ecr** | Container registry | Encryption, lifecycle policies, scanning |
-| **ecs** | Fargate service | Auto-scaling, Container Insights |
-| **alb** | Application Load Balancer | Access logs, HTTPS, health checks |
-| **dynamodb** | NoSQL database | Encryption, PITR, auto-scaling |
-| **api-gateway** | HTTP API (v2) | Throttling, logging, X-Ray |
-| **api-gateway-v1** | REST API | OpenAPI/Swagger support |
-| **cloudfront-s3** | CDN + Static hosting | SPA routing, OAC |
-| **waf** | Web Application Firewall | Rate limiting, IP filtering |
-| **cloudwatch-alarms** | Monitoring | CPU, memory, response time |
+| [vpc](./modules/vpc/) | Multi-AZ VPC | NAT gateways, VPC endpoints, flow logs |
+| [ecr](./modules/ecr/) | Container registry | Encryption, lifecycle policies, image scanning |
+| [ecs](./modules/ecs/) | Fargate service | Auto-scaling, Container Insights, Spot support |
+| [alb](./modules/alb/) | Application Load Balancer | Access logs, HTTPS, health checks |
+| [dynamodb](./modules/dynamodb/) | NoSQL database | Encryption, PITR, auto-scaling |
+| [api-gateway](./modules/api-gateway/) | HTTP API (v2) | Throttling, logging, X-Ray tracing |
+| [api-gateway-v1](./modules/api-gateway-v1/) | REST API | OpenAPI/Swagger support, VPC Link |
+| [cloudfront-s3](./modules/cloudfront-s3/) | CDN + Static hosting | SPA routing, OAC, custom domains |
+| [waf](./modules/waf/) | Web Application Firewall | Rate limiting, IP filtering, managed rules |
+| [cloudwatch-alarms](./modules/cloudwatch-alarms/) | Monitoring | CPU, memory, response time, error rates |
 
 ## Quick Start
 
@@ -88,101 +133,225 @@ curl $(terraform output -raw api_endpoint)/health
 terraform destroy -auto-approve
 ```
 
-##  Examples
+## Examples
 
-| Example | Description | Components |
-|---------|-------------|------------|
-| [ecs-app](./examples/ecs-app/) | Basic web app | ECS + ALB |
-| [api-gateway-multi-service](./examples/api-gateway-multi-service/) | Microservices | API Gateway + ECS + ALB |
-| [crud-api-rest](./examples/crud-api-rest/) | Full-stack CRUD | FastAPI + DynamoDB + React |
-| [mcp-agent-runtime](./examples/mcp-agent-runtime/) | MCP Server | Agent Gateway + ECS + MCP |
-| [rest-api-service](./examples/rest-api-service/) | Private API | REST API + VPC Link |
-| [openapi-http-api](./examples/openapi-http-api/) | Modern API | HTTP API + OpenAPI |
-| [openapi-rest-api](./examples/openapi-rest-api/) | Traditional API | REST API + Swagger |
+| Example | Description | Architecture | Components |
+|---------|-------------|--------------|------------|
+| [ecs-app](./examples/ecs-app/) | Basic web app | ALB + ECS | VPC, ALB, ECS, ECR |
+| [api-gateway-multi-service](./examples/api-gateway-multi-service/) | Microservices | API Gateway + ECS | API Gateway, VPC Link, ECS, ALB |
+| [crud-api-rest](./examples/crud-api-rest/) | Full-stack CRUD | REST API + DynamoDB | API Gateway v1, ECS, DynamoDB, React |
+| [crud-api-http](./examples/crud-api-http/) | Optimized CRUD | HTTP API + DynamoDB | API Gateway v2, ECS, DynamoDB, React |
+| [mcp-agent-runtime](./examples/mcp-agent-runtime/) | MCP Server | ECS + Agent Gateway | ECS, ALB, MCP Protocol |
+| [rest-api-service](./examples/rest-api-service/) | Private API | REST API + VPC Link | API Gateway v1, VPC Link, ECS |
+| [openapi-http-api](./examples/openapi-http-api/) | Modern API | HTTP API + OpenAPI | API Gateway v2, OpenAPI 3.0, ECS |
+| [openapi-rest-api](./examples/openapi-rest-api/) | Traditional API | REST API + Swagger | API Gateway v1, Swagger 2.0, ECS |
 
-##  Key Features
+### Architecture Patterns
+
+#### ECS with ALB
+```mermaid
+graph LR
+    Client[Client] --> ALB[Application Load Balancer]
+    ALB --> ECS1[ECS Task 1]
+    ALB --> ECS2[ECS Task 2]
+    ECS1 --> ECR[ECR Repository]
+    ECS2 --> ECR
+```
+
+#### API Gateway with VPC Link
+```mermaid
+graph LR
+    Client[Client] --> APIGW[API Gateway]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> ALB[Private ALB]
+    ALB --> ECS[ECS Tasks]
+```
+
+#### CRUD API Pattern
+```mermaid
+graph LR
+    Client[Client] --> APIGW[API Gateway]
+    APIGW --> ECS[ECS Fargate]
+    ECS --> DDB[DynamoDB]
+    Client --> CF[CloudFront]
+    CF --> S3[S3 Static Site]
+```
+
+## Key Features
 
 ### Idempotent Deployments
 ```bash
 terraform apply && terraform destroy && terraform apply  # Works!
 ```
 
+All modules support idempotent deployments with proper dependency management.
+
 ### Auto-Scaling
 ```hcl
-enable_autoscaling       = true
-autoscaling_min_capacity = 1
-autoscaling_max_capacity = 10
+module "ecs" {
+  source = "./modules/ecs"
+  
+  enable_autoscaling       = true
+  autoscaling_min_capacity = 1
+  autoscaling_max_capacity = 10
+  autoscaling_target_cpu   = 70
+  autoscaling_target_memory = 80
+}
 ```
 
 ### Cost Optimization
-```hcl
-# Dev: ~$70/month
-single_nat_gateway  = true
-enable_fargate_spot = true
 
-# Prod: ~$200/month
-single_nat_gateway  = false
-enable_vpc_endpoints = true
+#### Development Environment (~$70-90/month)
+```hcl
+module "vpc" {
+  source = "./modules/vpc"
+  
+  single_nat_gateway = true  # Single NAT instead of Multi-AZ
+}
+
+module "ecs" {
+  source = "./modules/ecs"
+  
+  enable_fargate_spot = true  # Use Spot pricing
+  desired_count       = 1     # Minimal capacity
+}
+```
+
+#### Production Environment (~$200-400/month)
+```hcl
+module "vpc" {
+  source = "./modules/vpc"
+  
+  single_nat_gateway   = false  # Multi-AZ NAT
+  enable_vpc_endpoints = true   # Reduce NAT costs
+}
+
+module "ecs" {
+  source = "./modules/ecs"
+  
+  enable_fargate_spot      = false
+  enable_autoscaling       = true
+  autoscaling_min_capacity = 2
+  autoscaling_max_capacity = 10
+}
 ```
 
 ### Security
-- Encryption at rest (ECR, DynamoDB, S3)
-- Secrets Manager integration
-- Scoped IAM policies
-- VPC endpoints
-- WAF protection
 
-##  Cost Estimates
+- **Encryption**: At rest (ECR, DynamoDB, S3) and in transit (TLS)
+- **Secrets Management**: AWS Secrets Manager integration
+- **IAM**: Least-privilege policies with scoped permissions
+- **Network**: VPC endpoints, private subnets, security groups
+- **WAF**: Rate limiting, IP filtering, managed rule sets
 
-| Environment | Monthly Cost | Key Resources |
+### Monitoring
+
+Built-in CloudWatch alarms for:
+- CPU/Memory utilization (ECS tasks)
+- ALB response time and error rates
+- Unhealthy target counts
+- API Gateway 4XX/5XX errors
+- DynamoDB throttling
+
+## Cost Estimates
+
+| Environment | Monthly Cost | Configuration |
 |-------------|--------------|---------------|
-| **Development** | $70-90 | Single NAT, Fargate Spot |
-| **Production** | $200-400 | Multi-AZ NAT, Auto-scaling |
+| **Development** | $70-90 | Single NAT, Fargate Spot, 1 task, minimal capacity |
+| **Staging** | $150-200 | Single NAT, On-Demand, 2 tasks, moderate capacity |
+| **Production** | $200-400 | Multi-AZ NAT, On-Demand, Auto-scaling 2-10 tasks |
 
-##  Secrets Management
+**Cost Breakdown** (Production):
+- NAT Gateways (2x): ~$65/month
+- Fargate (2-10 tasks): ~$50-200/month
+- ALB: ~$20/month
+- DynamoDB (on-demand): Variable
+- Data transfer: Variable
+
+## Secrets Management
 
 ```hcl
 module "ecs" {
   source = "./modules/ecs"
 
-  secrets = [{
-    name      = "DATABASE_PASSWORD"
-    valueFrom = "arn:aws:secretsmanager:..."
-  }]
+  secrets = [
+    {
+      name      = "DATABASE_PASSWORD"
+      valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:db-password"
+    },
+    {
+      name      = "API_KEY"
+      valueFrom = "arn:aws:secretsmanager:us-east-1:123456789012:secret:api-key"
+    }
+  ]
 }
 ```
 
-##  Monitoring
-
-Built-in CloudWatch alarms:
-- CPU/Memory utilization
-- ALB response time
-- Unhealthy targets
-- 5XX errors
-
-##  Testing
+## Testing
 
 ```bash
 # Test all modules
 ./scripts/test-modules.sh
 
-# Test idempotency
+# Test specific example
 ./scripts/test-idempotency.sh api-gateway-multi-service
+
+# Validate Terraform
+terraform fmt -check -recursive
+terraform validate
 ```
 
-##  Documentation
+## Development Setup
 
-- [well-architected.md](./docs/well-architected.md) - Architecture details
-- [modules/*/README.md](./modules/) - Module documentation
-- [examples/*/README.md](./examples/) - Example guides
+### Prerequisites
 
-##  Contributing
+- Terraform >= 1.0
+- AWS CLI configured
+- Docker (for examples)
+- pre-commit (optional but recommended)
+
+### Install pre-commit hooks
 
 ```bash
-pre-commit run --all-files
-./scripts/test-modules.sh
+pip install pre-commit
+pre-commit install
 ```
 
-##  License
+This will automatically:
+- Format Terraform code (`terraform fmt`)
+- Generate module documentation (`terraform-docs`)
+- Validate Terraform syntax (`terraform validate`)
+- Run linting checks (`tflint`)
+- Check for common issues (trailing whitespace, large files, etc.)
 
-MIT
+### Manual Documentation Update
+
+```bash
+# Update all module and example documentation
+pre-commit run terraform_docs --all-files
+
+# Update specific module
+cd modules/vpc
+terraform-docs markdown table --output-file README.md --output-mode inject .
+```
+
+The pre-commit hooks ensure that all Terraform documentation (inputs, outputs, providers, requirements) is automatically generated and kept up to date. See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed development guidelines.
+
+## Documentation
+
+- [Well-Architected Framework](./docs/well-architected.md) - Architecture details and best practices
+- [Module Documentation](./modules/) - Individual module README files
+- [Example Guides](./examples/) - Step-by-step deployment guides
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run pre-commit hooks: `pre-commit run --all-files`
+5. Test your changes: `./scripts/test-modules.sh`
+6. Submit a pull request
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details

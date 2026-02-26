@@ -2,6 +2,26 @@
 
 Simple FastAPI application deployed to ECS with ALB.
 
+## Architecture
+
+```mermaid
+graph LR
+    Client[Client] --> ALB[Application Load Balancer]
+    ALB --> ECS1[ECS Task 1]
+    ALB --> ECS2[ECS Task 2]
+    ECS1 --> ECR[ECR Repository]
+    ECS2 --> ECR
+```
+
+## Features
+
+- FastAPI web application
+- ECS Fargate with auto-scaling
+- Application Load Balancer
+- ECR for container images
+- CloudWatch logging
+- Health checks
+
 ## Quick Start
 
 ### Full Deployment

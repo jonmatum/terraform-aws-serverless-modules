@@ -10,34 +10,34 @@ IMAGE_TAG=${IMAGE_TAG:-$(git rev-parse --short HEAD 2>/dev/null || date +%s)}
 echo "=== OpenAPI HTTP API Redeployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
+echo ""
 
 # Get ECR URL and cluster info
 ECR_URL=$(terraform output -raw ecr_repository_url)
 CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)
 SERVICE_NAME=$(terraform output -raw ecs_service_name)
 
-# Login to ECR
-echo ""
-echo "Logging into ECR..."
+# Step 1: Login to ECR
+echo "Step 1: Logging into ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
 
-# Build and push
+# Step 2: Build and push image
 echo ""
-echo "Building image..."
+echo "Step 2: Building image..."
 docker build --platform linux/amd64 -t $ECR_URL:$IMAGE_TAG -t $ECR_URL:latest .
 
 echo "Pushing image..."
 docker push $ECR_URL:$IMAGE_TAG
 docker push $ECR_URL:latest
 
-# Apply terraform to update API Gateway if spec changed
+# Step 3: Update infrastructure
 echo ""
-echo "Updating infrastructure..."
+echo "Step 3: Updating infrastructure..."
 terraform apply -auto-approve
 
-# Force ECS update
+# Step 4: Force ECS service update
 echo ""
-echo "Forcing ECS service update..."
+echo "Step 4: Forcing ECS service update..."
 aws ecs update-service \
   --cluster $CLUSTER_NAME \
   --service $SERVICE_NAME \

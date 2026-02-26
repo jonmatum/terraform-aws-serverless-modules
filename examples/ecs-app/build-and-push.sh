@@ -1,10 +1,13 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 # Get ECR URL from Terraform output
 ECR_REPO=$(terraform output -raw ecr_repository_url 2>/dev/null)
 if [ -z "$ECR_REPO" ]; then
-  echo "❌ Error: ECR repository not found. Run 'terraform apply' first."
+  echo "Error: ECR repository not found. Run 'terraform apply' first."
   exit 1
 fi
 
@@ -24,4 +27,4 @@ aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS 
 echo "Pushing image to ECR..."
 docker push ${ECR_REPO}:${IMAGE_TAG}
 
-echo "✅ Image pushed successfully: ${ECR_REPO}:${IMAGE_TAG}"
+echo "Image pushed successfully: ${ECR_REPO}:${IMAGE_TAG}"

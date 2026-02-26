@@ -4,6 +4,16 @@ FastAPI service behind API Gateway v1 (REST API) with VPC Link and NLB.
 
 ## Architecture
 
+```mermaid
+graph LR
+    Client[Client] --> APIGW[API Gateway REST API v1]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> NLB[Network Load Balancer]
+    NLB --> ECS[ECS Fargate FastAPI]
+```
+
+## Features
+
 - FastAPI service on ECS (port 8000)
 - Network Load Balancer (NLB) in private subnets
 - API Gateway REST API with VPC Link to NLB

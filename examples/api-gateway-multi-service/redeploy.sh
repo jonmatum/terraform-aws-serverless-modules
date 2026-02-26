@@ -12,6 +12,7 @@ echo "=== Multi-Service Redeployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
 echo "Service: $SERVICE"
+echo ""
 
 # Get ECR URLs and cluster info
 FASTAPI_ECR_URL=$(terraform output -raw fastapi_ecr_url)
@@ -19,7 +20,6 @@ MCP_ECR_URL=$(terraform output -raw mcp_ecr_url)
 CLUSTER_NAME=$(terraform output -raw ecs_fastapi_cluster_name)
 
 # Login to ECR
-echo ""
 echo "Logging into ECR..."
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $FASTAPI_ECR_URL
 

@@ -54,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
 
 # ALB Target Response Time Alarm
 resource "aws_cloudwatch_metric_alarm" "alb_target_response_time" {
-  count               = var.enable_alarms && var.target_group_arn_suffix != null ? 1 : 0
+  count               = var.enable_alarms ? 1 : 0
   alarm_name          = "${var.service_name}-response-time-high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -75,7 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_target_response_time" {
 
 # ALB Unhealthy Host Count Alarm
 resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
-  count               = var.enable_alarms && var.target_group_arn_suffix != null ? 1 : 0
+  count               = var.enable_alarms ? 1 : 0
   alarm_name          = "${var.service_name}-unhealthy-hosts"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -96,7 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
 
 # ALB 5XX Error Rate Alarm
 resource "aws_cloudwatch_metric_alarm" "alb_5xx_errors" {
-  count               = var.enable_alarms && var.alb_arn_suffix != null ? 1 : 0
+  count               = var.enable_alarms ? 1 : 0
   alarm_name          = "${var.service_name}-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2

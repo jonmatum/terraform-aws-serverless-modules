@@ -2,11 +2,23 @@
 
 AWS WAF (Web Application Firewall) module for protecting web applications.
 
+## Features
+
+- AWS WAF v2 with managed and custom rules
+- Rate limiting rules
+- IP set filtering (allow/block lists)
+- Geographic blocking
+- SQL injection protection
+- XSS protection
+- AWS managed rule groups
+- CloudWatch metrics and logging
+
 ## Usage
 
 ```hcl
 module "waf" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/waf?ref=modules/waf/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/waf"
+  version = "2.0.1"
 
   name  = "my-waf"
   scope = "REGIONAL"
@@ -16,6 +28,11 @@ module "waf" {
   }
 }
 ```
+
+## Examples
+
+- [crud-api-rest](../../examples/crud-api-rest/) - WAF with API Gateway
+- [crud-api-http](../../examples/crud-api-http/) - WAF with HTTP API
 
 ## Features
 

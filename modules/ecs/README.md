@@ -2,11 +2,23 @@
 
 ECS Fargate service module with cluster, task definition, and service.
 
+## Features
+
+- ECS Fargate cluster with Container Insights
+- Task definition with configurable CPU/memory
+- ECS service with load balancer integration
+- Auto-scaling based on CPU and memory
+- Fargate Spot support for cost optimization
+- Secrets Manager and SSM Parameter Store integration
+- CloudWatch Logs integration
+- Health check grace period configuration
+
 ## Usage
 
 ```hcl
 module "ecs" {
-  source = "github.com/jonmatum/aws-ecs-poc//modules/ecs?ref=modules/ecs/v0.1.0"
+  source  = "jonmatum/serverless-modules/aws//modules/ecs"
+  version = "2.0.1"
 
   cluster_name       = "my-cluster"
   task_family        = "my-app"
@@ -21,6 +33,13 @@ module "ecs" {
   aws_region         = "us-east-1"
 }
 ```
+
+## Examples
+
+- [ecs-app](../../examples/ecs-app/) - Basic ECS application
+- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service architecture
+- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with DynamoDB
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 

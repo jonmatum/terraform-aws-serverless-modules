@@ -2,6 +2,18 @@
 
 FastAPI application with automatic OpenAPI schema import to API Gateway REST API (v1).
 
+## Architecture
+
+```mermaid
+graph LR
+    Client[Client] --> APIGW[API Gateway REST API v1]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> NLB[Network Load Balancer]
+    NLB --> ECS[ECS Fargate FastAPI]
+    ECS -.-> OpenAPI[OpenAPI 3.0 Schema]
+    OpenAPI -.-> Swagger[Swagger 2.0]
+```
+
 ## Features
 
 - FastAPI app with multiple CRUD endpoints
@@ -10,7 +22,7 @@ FastAPI application with automatic OpenAPI schema import to API Gateway REST API
 - Full REST API for product management (GET, POST, PUT, DELETE)
 - VPC Link integration with NLB
 
-## Architecture
+## How It Works
 
 1. FastAPI generates OpenAPI 3.0 schema (via Docker during deployment)
 2. Schema converted to Swagger 2.0 for REST API compatibility

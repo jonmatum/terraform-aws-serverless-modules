@@ -4,10 +4,23 @@ FastAPI and Node MCP services behind API Gateway with VPC Link.
 
 ## Architecture
 
+```mermaid
+graph TB
+    Client[Client] --> APIGW[API Gateway HTTP API]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> ALB1[ALB FastAPI]
+    VPCLink --> ALB2[ALB MCP]
+    ALB1 --> ECS1[ECS FastAPI Service]
+    ALB2 --> ECS2[ECS MCP Service]
+```
+
+## Features
+
 - FastAPI service on ECS (port 8000) → `/api/fastapi/*`
 - Node MCP service on ECS (port 3000) → `/api/mcp/*`
 - API Gateway HTTP API with VPC Link to private ECS services
 - Services in private subnets, exposed via API Gateway
+- Independent scaling per service
 
 ## Deployment
 

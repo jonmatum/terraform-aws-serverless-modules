@@ -4,12 +4,16 @@ Complete CRUD application with FastAPI backend, DynamoDB, API Gateway REST API w
 
 ## Architecture
 
-```
-Internet → CloudFront → S3 (React App)
-              ↓
-         API Gateway REST API (v1) → VPC Link → NLB → ALB → ECS (FastAPI) → DynamoDB
-              ↓
-         WAF (optional)
+```mermaid
+graph LR
+    Client[Client] --> CF[CloudFront]
+    CF --> S3[S3 React App]
+    Client --> APIGW[API Gateway REST API v1]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> NLB[Network Load Balancer]
+    NLB --> ALB[Application Load Balancer]
+    ALB --> ECS[ECS Fargate FastAPI]
+    ECS --> DDB[DynamoDB]
 ```
 
 **Note**: API Gateway REST API v1 requires NLB for VPC Link (AWS limitation). The NLB forwards traffic to ALB, which then routes to ECS. This adds ~$16/month for the NLB and 1-3ms latency. For cost optimization, consider using API Gateway HTTP API (v2) which supports ALB directly.
@@ -17,29 +21,29 @@ Internet → CloudFront → S3 (React App)
 ## Features
 
 ### Backend (FastAPI)
-- ✅ Full CRUD operations (Create, Read, Update, Delete)
-- ✅ DynamoDB integration
-- ✅ Pydantic validation
-- ✅ OpenAPI/Swagger documentation
-- ✅ Health check endpoint
-- ✅ CORS support
+- Full CRUD operations (Create, Read, Update, Delete)
+- DynamoDB integration
+- Pydantic validation
+- OpenAPI/Swagger documentation
+- Health check endpoint
+- CORS support
 
 ### Infrastructure
-- ✅ API Gateway REST API with Swagger/OpenAPI spec
-- ✅ VPC Link for private integration
-- ✅ DynamoDB with encryption & PITR
-- ✅ ECS Fargate with auto-scaling
-- ✅ CloudFront + S3 for React app
-- ✅ WAF protection (optional)
-- ✅ CloudWatch Logs & monitoring
-- ✅ X-Ray tracing support
+- API Gateway REST API with Swagger/OpenAPI spec
+- VPC Link for private integration
+- DynamoDB with encryption & PITR
+- ECS Fargate with auto-scaling
+- CloudFront + S3 for React app
+- WAF protection (optional)
+- CloudWatch Logs & monitoring
+- X-Ray tracing support
 
 ### Frontend (React)
-- ✅ Item list view
-- ✅ Create/Edit forms
-- ✅ Delete confirmation
-- ✅ API integration
-- ✅ Responsive design
+- Item list view
+- Create/Edit forms
+- Delete confirmation
+- API integration
+- Responsive design
 
 ## Quick Start
 
@@ -178,11 +182,11 @@ terraform destroy -auto-approve
 
 ## Well-Architected Compliance
 
-- ✅ **Security**: Encryption, IAM least privilege, VPC endpoints, WAF
-- ✅ **Reliability**: Multi-AZ, auto-scaling, health checks, PITR
-- ✅ **Performance**: Fargate, DynamoDB PAY_PER_REQUEST, CloudFront
-- ✅ **Cost**: Auto-scaling, lifecycle policies, VPC endpoints
-- ✅ **Operations**: IaC, logging, monitoring, X-Ray tracing
+- **Security**: Encryption, IAM least privilege, VPC endpoints, WAF
+- **Reliability**: Multi-AZ, auto-scaling, health checks, PITR
+- **Performance**: Fargate, DynamoDB PAY_PER_REQUEST, CloudFront
+- **Cost**: Auto-scaling, lifecycle policies, VPC endpoints
+- **Operations**: IaC, logging, monitoring, X-Ray tracing
 
 ## Troubleshooting
 

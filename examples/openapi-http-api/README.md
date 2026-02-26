@@ -2,6 +2,17 @@
 
 FastAPI application with automatic OpenAPI schema import to API Gateway HTTP API (v2).
 
+## Architecture
+
+```mermaid
+graph LR
+    Client[Client] --> APIGW[API Gateway HTTP API v2]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> NLB[Network Load Balancer]
+    NLB --> ECS[ECS Fargate FastAPI]
+    ECS -.-> OpenAPI[OpenAPI 3.0 Schema]
+```
+
 ## Features
 
 - FastAPI app with multiple CRUD endpoints
@@ -10,7 +21,7 @@ FastAPI application with automatic OpenAPI schema import to API Gateway HTTP API
 - Full REST API for user management (GET, POST, PUT, DELETE)
 - VPC Link integration with NLB
 
-## Architecture
+## How It Works
 
 1. FastAPI generates OpenAPI 3.0 schema
 2. Terraform extracts schema and configures API Gateway

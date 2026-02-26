@@ -1,30 +1,23 @@
 # MCP Agent Runtime Example
 
-**⚠️ REQUIRES: AWS Provider >= 6.18.0** (for `aws_bedrockagentcore_gateway` resources)
+**REQUIRES: AWS Provider >= 6.18.0** (for `aws_bedrockagentcore_gateway` resources)
 
-Model Context Protocol (MCP) server running on ECS Fargate, exposed via **Amazon Bedrock AgentCore Gateway**.
+**NOTE**: This example demonstrates the infrastructure setup for an MCP server on ECS Fargate. The AgentCore Gateway Target requires HTTPS endpoints. For production use, configure the ALB with an HTTPS listener and ACM certificate.
+
+Model Context Protocol (MCP) server running on ECS Fargate with Amazon Bedrock AgentCore Gateway.
 
 ## Architecture
 
-```
-┌──────────────────────┐
-│  AgentCore Gateway   │ (AWS Bedrock AgentCore)
-│   MCP Protocol       │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│        ALB           │ (Application Load Balancer)
-│     (Internal)       │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│    ECS Fargate       │ (MCP Server Container)
-│    (Private)         │
-│    - Auto-scale      │
-│    - Spot 50%        │
-└──────────────────────┘
+```mermaid
+graph TB
+    Client[Client/Agent] --> Gateway[AgentCore Gateway]
+    Gateway -.->|Requires HTTPS| ALB[Application Load Balancer]
+    ALB --> ECS1[ECS Task 1]
+    ALB --> ECS2[ECS Task 2]
+    ECS1 --> ECR[ECR Repository]
+    ECS2 --> ECR
+    ECS1 -.-> CW[CloudWatch Logs]
+    ECS2 -.-> CW
 ```
 
 ## Components
@@ -32,7 +25,7 @@ Model Context Protocol (MCP) server running on ECS Fargate, exposed via **Amazon
 - **MCP Server**: Node.js application implementing Model Context Protocol
 - **ECS Fargate**: Serverless container runtime with auto-scaling
 - **ALB**: Load balancer for health checks and traffic distribution
-- **AgentCore Gateway**: AWS-native MCP gateway with IAM authentication
+- **AgentCore Gateway**: AWS-native MCP gateway with IAM authentication (requires HTTPS target)
 - **CloudWatch**: Logs, metrics, and alarms
 - **ECR**: Container registry with lifecycle policies
 
@@ -50,12 +43,33 @@ The server exposes two example tools:
 - AWS CLI configured
 - Docker installed
 - Terraform >= 1.0
+- (Optional) ACM certificate ARN for HTTPS
 
 ### Deploy
 
+**Basic deployment (HTTP only, no Gateway Target):**
 ```bash
-./deploy.sh
+terraform apply
 ```
+
+**Full deployment with HTTPS and Gateway Target:**
+```bash
+# Create or import ACM certificate first
+aws acm request-certificate \
+  --domain-name your-domain.com \
+  --validation-method DNS
+
+# Deploy with certificate
+terraform apply -var="certificate_arn=arn:aws:acm:us-east-1:ACCOUNT:certificate/CERT_ID"
+```
+
+This will:
+1. Create infrastructure (VPC, ECS, ALB, Gateway)
+2. Build and push Docker image to ECR
+3. Deploy MCP server to ECS
+4. Configure HTTPS listener (if certificate provided)
+5. Connect Gateway to MCP server (if certificate provided)
+6. Output test commands
 
 This will:
 1. Create infrastructure (VPC, ECS, ALB, API Gateway)
@@ -159,40 +173,40 @@ mcpServer.setRequestHandler('tools/call', async (request) => {
 ## Well-Architected Features
 
 ### Security
-- ✅ Private subnets for ECS tasks
-- ✅ Security groups with specific ports
-- ✅ VPC endpoints for AWS services
-- ✅ IAM roles with least privilege
-- ✅ ECR image scanning enabled
+- Private subnets for ECS tasks
+- Security groups with specific ports
+- VPC endpoints for AWS services
+- IAM roles with least privilege
+- ECR image scanning enabled
 
 ### Reliability
-- ✅ Multi-AZ deployment
-- ✅ Auto-scaling (1-4 tasks)
-- ✅ Health checks on ALB and ECS
-- ✅ CloudWatch alarms for monitoring
+- Multi-AZ deployment
+- Auto-scaling (1-4 tasks)
+- Health checks on ALB and ECS
+- CloudWatch alarms for monitoring
 
 ### Operational Excellence
-- ✅ Container Insights enabled
-- ✅ CloudWatch Logs (30-day retention)
-- ✅ X-Ray tracing on API Gateway
-- ✅ Access logs for ALB
+- Container Insights enabled
+- CloudWatch Logs (30-day retention)
+- X-Ray tracing on API Gateway
+- Access logs for ALB
 
 ### Performance
-- ✅ Fargate for serverless scaling
-- ✅ VPC Link for low-latency access
-- ✅ Connection draining on ALB
-- ✅ API Gateway throttling
+- Fargate for serverless scaling
+- VPC Link for low-latency access
+- Connection draining on ALB
+- API Gateway throttling
 
 ### Cost Optimization
-- ✅ Fargate Spot (50% of capacity)
-- ✅ Single NAT gateway (dev)
-- ✅ ECR lifecycle policies
-- ✅ Auto-scaling based on demand
+- Fargate Spot (50% of capacity)
+- Single NAT gateway (dev)
+- ECR lifecycle policies
+- Auto-scaling based on demand
 
 ### Sustainability
-- ✅ Right-sized containers (256 CPU, 512 MB)
-- ✅ Auto-scaling to match demand
-- ✅ Efficient networking with VPC endpoints
+- Right-sized containers (256 CPU, 512 MB)
+- Auto-scaling to match demand
+- Efficient networking with VPC endpoints
 
 ## Cost Estimate
 

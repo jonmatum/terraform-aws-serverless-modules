@@ -4,62 +4,65 @@
 
 ## Architecture
 
-```
-Internet → CloudFront → S3 (React App)
-              ↓
-         API Gateway HTTP API (v2) → VPC Link → ALB → ECS (FastAPI) → DynamoDB
-              ↓
-         WAF (optional)
+```mermaid
+graph LR
+    Client[Client] --> CF[CloudFront]
+    CF --> S3[S3 React App]
+    Client --> APIGW[API Gateway HTTP API v2]
+    APIGW --> VPCLink[VPC Link]
+    VPCLink --> ALB[Application Load Balancer]
+    ALB --> ECS[ECS Fargate FastAPI]
+    ECS --> DDB[DynamoDB]
 ```
 
 ## Why HTTP API (v2)?
 
-✅ **71% cheaper** than REST API  
-✅ **No NLB required** - connects directly to ALB  
-✅ **Lower latency** - one less network hop  
-✅ **Simpler architecture** - fewer components  
-✅ **Still supports** OpenAPI, CORS, JWT auth, custom domains
+- **71% cheaper** than REST API
+- **No NLB required** - connects directly to ALB
+- **Lower latency** - one less network hop
+- **Simpler architecture** - fewer components
+- **Still supports** OpenAPI, CORS, JWT auth, custom domains
 
 ### When to Use HTTP API vs REST API
 
 | Feature | HTTP API (v2) | REST API (v1) |
 |---------|---------------|---------------|
-| Cost | ✅ Cheaper | ❌ More expensive |
-| Latency | ✅ Lower | ⚠️ Higher (NLB hop) |
-| ALB Integration | ✅ Direct | ❌ Requires NLB |
-| API Keys | ❌ No | ✅ Yes |
-| Request Validation | ⚠️ Limited | ✅ Full |
-| Usage Plans | ❌ No | ✅ Yes |
-| SDK Generation | ❌ No | ✅ Yes |
+| Cost | Cheaper | More expensive |
+| Latency | Lower | Higher (NLB hop) |
+| ALB Integration | Direct | Requires NLB |
+| API Keys | No | Yes |
+| Request Validation | Limited | Full |
+| Usage Plans | No | Yes |
+| SDK Generation | No | Yes |
 
 **Use this example** for most modern APIs. Use REST API only if you need API keys, usage plans, or request validation.
 
 ## Features
 
 ### Backend (FastAPI)
-- ✅ Full CRUD operations
-- ✅ DynamoDB integration
-- ✅ Pydantic validation
-- ✅ OpenAPI/Swagger documentation
-- ✅ Health check endpoint
-- ✅ CORS support
+- Full CRUD operations
+- DynamoDB integration
+- Pydantic validation
+- OpenAPI/Swagger documentation
+- Health check endpoint
+- CORS support
 
 ### Infrastructure
-- ✅ API Gateway HTTP API (v2)
-- ✅ VPC Link for private integration (no NLB!)
-- ✅ DynamoDB with encryption & PITR
-- ✅ ECS Fargate with auto-scaling
-- ✅ CloudFront + S3 for React app
-- ✅ WAF protection (optional)
-- ✅ CloudWatch Logs & monitoring
-- ✅ X-Ray tracing support
+- API Gateway HTTP API (v2)
+- VPC Link for private integration (no NLB!)
+- DynamoDB with encryption & PITR
+- ECS Fargate with auto-scaling
+- CloudFront + S3 for React app
+- WAF protection (optional)
+- CloudWatch Logs & monitoring
+- X-Ray tracing support
 
 ### Frontend (React)
-- ✅ Item list view
-- ✅ Create/Edit forms
-- ✅ Delete confirmation
-- ✅ API integration
-- ✅ Responsive design
+- Item list view
+- Create/Edit forms
+- Delete confirmation
+- API integration
+- Responsive design
 
 ## Quick Start
 
@@ -185,12 +188,12 @@ terraform destroy -auto-approve
 
 ## Well-Architected Compliance
 
-- ✅ **Security**: Encryption, IAM least privilege, VPC endpoints, WAF
-- ✅ **Reliability**: Multi-AZ, auto-scaling, health checks, PITR
-- ✅ **Performance**: Fargate, DynamoDB PAY_PER_REQUEST, CloudFront, direct ALB integration
-- ✅ **Cost**: HTTP API (71% cheaper), auto-scaling, lifecycle policies
-- ✅ **Operations**: IaC, logging, monitoring, X-Ray tracing
-- ✅ **Sustainability**: Fewer resources (no NLB), lower carbon footprint
+- **Security**: Encryption, IAM least privilege, VPC endpoints, WAF
+- **Reliability**: Multi-AZ, auto-scaling, health checks, PITR
+- **Performance**: Fargate, DynamoDB PAY_PER_REQUEST, CloudFront, direct ALB integration
+- **Cost**: HTTP API (71% cheaper), auto-scaling, lifecycle policies
+- **Operations**: IaC, logging, monitoring, X-Ray tracing
+- **Sustainability**: Fewer resources (no NLB), lower carbon footprint
 
 ## Comparison with REST API Example
 
@@ -200,25 +203,25 @@ terraform destroy -auto-approve
 | Components | 3 hops | 4 hops |
 | Monthly Cost | ~$65 | ~$85 |
 | Latency | Lower | Higher (+1-3ms) |
-| API Keys | ❌ | ✅ |
-| Usage Plans | ❌ | ✅ |
+| API Keys | No | Yes |
+| Usage Plans | No | Yes |
 | Request Validation | Limited | Full |
 
 ## When to Use Each
 
 ### Use HTTP API (this example) when:
-- ✅ Building modern REST APIs
-- ✅ Cost optimization is important
-- ✅ Don't need API keys or usage plans
-- ✅ Want simpler architecture
-- ✅ Need lower latency
+- Building modern REST APIs
+- Cost optimization is important
+- Don't need API keys or usage plans
+- Want simpler architecture
+- Need lower latency
 
 ### Use REST API when:
-- ✅ Need API keys and usage plans
-- ✅ Need request/response transformation
-- ✅ Need request validation
-- ✅ Need SDK generation
-- ✅ Legacy compatibility required
+- Need API keys and usage plans
+- Need request/response transformation
+- Need request validation
+- Need SDK generation
+- Legacy compatibility required
 
 ## Troubleshooting
 
