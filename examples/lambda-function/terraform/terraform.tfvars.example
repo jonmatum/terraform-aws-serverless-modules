@@ -1,0 +1,53 @@
+# Example production configuration
+
+# Basic settings
+aws_region    = "us-east-1"
+function_name = "hello-lambda"
+image_tag     = "latest"
+
+# Performance settings
+timeout     = 30
+memory_size = 512
+
+# Environment variables
+environment_variables = {
+  ENVIRONMENT = "production"
+  LOG_LEVEL   = "info"
+}
+
+# Function URL settings
+enable_function_url    = true
+function_url_auth_type = "NONE" # Use "AWS_IAM" for private APIs
+function_url_cors = {
+  allow_origins = ["*"]
+  allow_methods = ["GET", "POST"]
+  allow_headers = ["content-type"]
+  max_age       = 300
+}
+
+# Observability
+enable_xray            = true
+enable_lambda_insights = true
+log_retention_days     = 7
+
+# Reliability settings
+reserved_concurrent_executions = 10
+enable_dlq                     = true
+dlq_message_retention_seconds  = 1209600 # 14 days
+maximum_retry_attempts         = 2
+maximum_event_age_in_seconds   = 21600 # 6 hours
+
+# CloudWatch Alarms with SNS notifications
+create_alarm_topic                    = true
+alarm_email                           = "your-email@example.com" # Change this!
+alarm_error_threshold                 = 5
+alarm_throttle_threshold              = 5
+alarm_duration_threshold              = 25000 # 25 seconds
+alarm_concurrent_executions_threshold = 8     # 80% of reserved concurrency
+
+# Tags
+tags = {
+  Environment = "production"
+  Project     = "lambda-function"
+  ManagedBy   = "terraform"
+}
