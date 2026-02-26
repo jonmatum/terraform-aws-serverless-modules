@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.0.1...v2.1.0) (2026-02-26)
+
+
+### Features
+
+* **mcp-agent-runtime:** update MCP server to use proper SDK schemas and unified endpoint ([460bcff](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/460bcff9305ebfb59244fa748275c1ffbc5ad9b9))
+
 ## [2.0.1](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.0.0...v2.0.1) (2026-02-26)
 
 
