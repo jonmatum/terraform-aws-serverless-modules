@@ -4,13 +4,13 @@ FastAPI service behind API Gateway v1 (REST API) with VPC Link and NLB.
 
 ## Architecture
 
-```mermaid
-graph LR
-    Client[Client] --> APIGW[API Gateway REST API v1]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> NLB[Network Load Balancer]
-    NLB --> ECS[ECS Fargate FastAPI]
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- Private API integration
+- Request flow
+- Terraform resource relationships
+- Security considerations
+- Cost breakdown
 
 ## Features
 

@@ -8,17 +8,13 @@ Model Context Protocol (MCP) server running on ECS Fargate with Amazon Bedrock A
 
 ## Architecture
 
-```mermaid
-graph TB
-    Client[Client/Agent] --> Gateway[AgentCore Gateway]
-    Gateway -.->|Requires HTTPS| ALB[Application Load Balancer]
-    ALB --> ECS1[ECS Task 1]
-    ALB --> ECS2[ECS Task 2]
-    ECS1 --> ECR[ECR Repository]
-    ECS2 --> ECR
-    ECS1 -.-> CW[CloudWatch Logs]
-    ECS2 -.-> CW
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- MCP protocol flow
+- Terraform resource relationships
+- Deployment flow
+- Cost breakdown
+- Production considerations
 
 ## Components
 

@@ -1,0 +1,81 @@
+graph TB
+    subgraph "Public Subnet"
+        ALB[Application Load Balancer]
+        NAT[NAT Gateway]
+        APIGW[API Gateway]
+        AGENTGW[Agent Gateway]
+    end
+    
+    subgraph "Private Subnet"
+        ECS[ECS Fargate Tasks]
+        LAMBDA[Lambda Functions]
+        AGENTRT[Agent Runtime]
+    end
+    
+    subgraph "Data Layer"
+        DDB[DynamoDB]
+        RDS[RDS Database]
+        ECR[ECR Repository]
+    end
+    
+    subgraph "Messaging & Queues"
+        SQS[SQS Queue]
+        SNS[SNS Topic]
+    end
+    
+    subgraph "Orchestration"
+        SF[Step Functions]
+    end
+    
+    subgraph "AI/ML Services"
+        BEDROCK[Amazon Bedrock]
+        AGENTCORE[Bedrock AgentCore]
+    end
+    
+    subgraph "Security & Monitoring"
+        WAF[AWS WAF]
+        CW[CloudWatch]
+        SM[Secrets Manager]
+    end
+    
+    Internet((Internet)) --> WAF
+    WAF --> ALB
+    WAF --> APIGW
+    WAF --> AGENTGW
+    ALB --> ECS
+    APIGW --> ECS
+    APIGW --> LAMBDA
+    AGENTGW --> AGENTRT
+    AGENTRT --> BEDROCK
+    AGENTRT --> AGENTCORE
+    AGENTCORE --> LAMBDA
+    AGENTCORE --> SF
+    ECS --> DDB
+    ECS --> RDS
+    LAMBDA --> DDB
+    LAMBDA --> RDS
+    ECS --> SQS
+    LAMBDA --> SQS
+    SQS --> SNS
+    SF --> LAMBDA
+    SF --> ECS
+    ECS --> NAT
+    NAT --> Internet
+    ECS -.-> ECR
+    ECS -.-> SM
+    LAMBDA -.-> SM
+    AGENTRT -.-> SM
+    ECS -.-> CW
+    LAMBDA -.-> CW
+    SF -.-> CW
+    AGENTRT -.-> CW
+    
+    style ALB fill:#FF9900
+    style ECS fill:#FF9900
+    style DDB fill:#FF9900
+    style APIGW fill:#FF9900
+    style LAMBDA fill:#FF9900
+    style SF fill:#FF9900
+    style AGENTGW fill:#FF9900
+    style AGENTRT fill:#FF9900
+    style BEDROCK fill:#FF9900

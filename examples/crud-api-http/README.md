@@ -4,16 +4,12 @@
 
 ## Architecture
 
-```mermaid
-graph LR
-    Client[Client] --> CF[CloudFront]
-    CF --> S3[S3 React App]
-    Client --> APIGW[API Gateway HTTP API v2]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> ALB[Application Load Balancer]
-    ALB --> ECS[ECS Fargate FastAPI]
-    ECS --> DDB[DynamoDB]
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- HTTP API vs REST API comparison
+- CRUD operations flow
+- Terraform resource relationships
+- Cost breakdown and savings analysis
 
 ## Why HTTP API (v2)?
 

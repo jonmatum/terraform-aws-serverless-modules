@@ -8,50 +8,6 @@
 
 Terraform modules for deploying serverless and container-based applications on AWS, following AWS Well-Architected Framework best practices.
 
-## Architecture Overview
-
-```mermaid
-graph TB
-    subgraph "Public Subnet"
-        ALB[Application Load Balancer]
-        NAT[NAT Gateway]
-        APIGW[API Gateway]
-    end
-    
-    subgraph "Private Subnet"
-        ECS[ECS Fargate Tasks]
-        LAMBDA[Lambda Functions]
-    end
-    
-    subgraph "Data Layer"
-        DDB[DynamoDB]
-        ECR[ECR Repository]
-    end
-    
-    subgraph "Security & Monitoring"
-        WAF[AWS WAF]
-        CW[CloudWatch]
-        SM[Secrets Manager]
-    end
-    
-    Internet((Internet)) --> WAF
-    WAF --> ALB
-    WAF --> APIGW
-    ALB --> ECS
-    APIGW --> ECS
-    ECS --> DDB
-    ECS --> NAT
-    NAT --> Internet
-    ECS -.-> ECR
-    ECS -.-> SM
-    ECS -.-> CW
-    
-    style ALB fill:#FF9900
-    style ECS fill:#FF9900
-    style DDB fill:#FF9900
-    style APIGW fill:#FF9900
-```
-
 ## Well-Architected Framework
 
 Built following [AWS Well-Architected Framework](./docs/well-architected.md) best practices:
@@ -67,7 +23,7 @@ Built following [AWS Well-Architected Framework](./docs/well-architected.md) bes
 ```hcl
 module "vpc" {
   source  = "jonmatum/serverless-modules/aws//modules/vpc"
-  version = "2.0.1"
+  version = "~> 2.0"
   
   project_name = "my-app"
   cidr_block   = "10.0.0.0/16"
@@ -75,7 +31,7 @@ module "vpc" {
 
 module "ecs" {
   source  = "jonmatum/serverless-modules/aws//modules/ecs"
-  version = "2.0.1"
+  version = "~> 2.0"
   
   cluster_name = "my-cluster"
   vpc_id       = module.vpc.vpc_id
@@ -116,6 +72,8 @@ cd examples/crud-api-rest
 
 ### 2. Deploy
 
+Each example includes a deploy script:
+
 ```bash
 ./deploy.sh
 ```
@@ -148,33 +106,20 @@ terraform destroy -auto-approve
 
 ### Architecture Patterns
 
-#### ECS with ALB
-```mermaid
-graph LR
-    Client[Client] --> ALB[Application Load Balancer]
-    ALB --> ECS1[ECS Task 1]
-    ALB --> ECS2[ECS Task 2]
-    ECS1 --> ECR[ECR Repository]
-    ECS2 --> ECR
+**ECS with ALB:**
+```
+Client → Application Load Balancer → ECS Tasks (1-N) → ECR Repository
 ```
 
-#### API Gateway with VPC Link
-```mermaid
-graph LR
-    Client[Client] --> APIGW[API Gateway]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> ALB[Private ALB]
-    ALB --> ECS[ECS Tasks]
+**API Gateway with VPC Link:**
+```
+Client → API Gateway → VPC Link → Private ALB → ECS Tasks
 ```
 
-#### CRUD API Pattern
-```mermaid
-graph LR
-    Client[Client] --> APIGW[API Gateway]
-    APIGW --> ECS[ECS Fargate]
-    ECS --> DDB[DynamoDB]
-    Client --> CF[CloudFront]
-    CF --> S3[S3 Static Site]
+**CRUD API Pattern:**
+```
+Client → API Gateway → ECS Fargate → DynamoDB
+Client → CloudFront → S3 Static Site
 ```
 
 ## Key Features

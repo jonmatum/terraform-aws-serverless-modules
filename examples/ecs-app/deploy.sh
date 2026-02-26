@@ -2,50 +2,52 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+TERRAFORM_DIR="$SCRIPT_DIR/terraform"
+APP_DIR="$SCRIPT_DIR/app"
 
+IMAGE_TAG=${1:-latest}
 AWS_REGION=${AWS_REGION:-us-east-1}
-IMAGE_TAG=${IMAGE_TAG:-latest}
 
 echo "=== ECS App Deployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
 echo ""
 
-# Check prerequisites
-if ! command -v aws &> /dev/null; then
-    echo "Error: AWS CLI is not installed"
-    exit 1
-fi
+# Change to Terraform directory
+cd "$TERRAFORM_DIR"
 
-if ! command -v docker &> /dev/null; then
-    echo "Error: Docker is not installed"
-    exit 1
-fi
-
-# Step 1: Initialize Terraform
-echo "Step 1: Initializing Terraform..."
+# Initialize Terraform (always run to ensure modules are up to date)
+echo "Initializing Terraform..."
 terraform init
 
-# Step 2: Create ECR and supporting infrastructure
-echo ""
-echo "Step 2: Creating ECR repository and supporting infrastructure..."
-terraform apply -auto-approve -target=module.ecr -target=module.vpc -target=module.alb -target=aws_cloudwatch_log_group.this -target=aws_iam_role.ecs_execution -target=aws_iam_role_policy_attachment.ecs_execution -target=aws_iam_role_policy.ecs_execution_logs -target=aws_security_group.ecs_tasks
-
-# Step 3: Build and push Docker image
-echo ""
-echo "Step 3: Building and pushing Docker image..."
-./build-and-push.sh
-
-# Step 4: Deploy ECS service
-echo ""
-echo "Step 4: Deploying ECS service..."
+# Apply infrastructure
+echo "Applying infrastructure..."
 terraform apply -auto-approve
+
+# Get ECR repository URL
+ECR_REPO=$(terraform output -raw ecr_repository_url)
+APP_NAME=$(basename "$ECR_REPO")
+
+# Build and push image
+echo ""
+echo "Building and pushing Docker image..."
+docker build --platform linux/amd64 -t ${APP_NAME}:${IMAGE_TAG} "$APP_DIR"
+docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
+
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
+docker push ${ECR_REPO}:${IMAGE_TAG}
+
+# Force ECS update if service exists
+CLUSTER=$(terraform output -raw ecs_cluster_name)
+SERVICE=$(terraform output -raw ecs_service_name)
+
+if aws ecs describe-services --region ${AWS_REGION} --cluster ${CLUSTER} --services ${SERVICE} --query 'services[0].status' --output text 2>/dev/null | grep -q ACTIVE; then
+  echo ""
+  echo "Updating ECS service..."
+  aws ecs update-service --region ${AWS_REGION} --cluster ${CLUSTER} --service ${SERVICE} --force-new-deployment --no-cli-pager > /dev/null
+fi
 
 echo ""
 echo "=== Deployment Complete ==="
-echo ""
-echo "Application URL: http://$(terraform output -raw alb_dns_name)"
-echo ""
-echo "Test with:"
-echo "  curl http://$(terraform output -raw alb_dns_name)"
+ALB_URL=$(terraform output -raw alb_dns_name)
+echo "Application URL: http://${ALB_URL}"

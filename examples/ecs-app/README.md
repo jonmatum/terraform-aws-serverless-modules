@@ -4,109 +4,119 @@ Simple FastAPI application deployed to ECS with ALB.
 
 ## Architecture
 
-```mermaid
-graph LR
-    Client[Client] --> ALB[Application Load Balancer]
-    ALB --> ECS1[ECS Task 1]
-    ALB --> ECS2[ECS Task 2]
-    ECS1 --> ECR[ECR Repository]
-    ECS2 --> ECR
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- Terraform resource relationships
+- Request flow sequences
+- Auto-scaling behavior
+- Monitoring setup
+- Deployment flow
+- Cost breakdown
 
 ## Features
 
 - FastAPI web application
-- ECS Fargate with auto-scaling
-- Application Load Balancer
+- ECS Fargate with auto-scaling (2-4 tasks)
+- Application Load Balancer with optional HTTPS
+- WAF protection with rate limiting and IP reputation rules
+- CloudWatch alarms for monitoring
+- Container Insights enabled
 - ECR for container images
 - CloudWatch logging
 - Health checks
 
 ## Quick Start
 
-### Full Deployment
-
 ```bash
 cd examples/ecs-app
 ./deploy.sh
 ```
 
-This script will:
-1. Initialize Terraform
-2. Create all infrastructure (VPC, ALB, ECR, ECS)
-3. Build and push Docker image to ECR
-4. Deploy the ECS service
-5. Output the application URL
+The script is idempotent and handles:
+- Initial deployment (creates all infrastructure)
+- Updates (rebuilds image, updates ECS service)
 
-### Manual Deployment
-
-#### 1. Create Infrastructure
-
+Optional: specify image tag
 ```bash
-terraform init
-terraform apply
-```
-
-#### 2. Build and Push Docker Image
-
-```bash
-./build-and-push.sh
-```
-
-Or manually:
-
-```bash
-# Get ECR repository URL
-ECR_URL=$(terraform output -raw ecr_repository_url)
-
-# Login to ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
-
-# Build and push
-docker build -t $ECR_URL:latest .
-docker push $ECR_URL:latest
-```
-
-#### 3. Force ECS Service Update
-
-```bash
-CLUSTER=$(terraform output -raw ecs_cluster_name)
-SERVICE=$(terraform output -raw ecs_service_name)
-aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment
+./deploy.sh v1.2.3
 ```
 
 ## Testing
 
 ```bash
 # Get application URL
-ALB_URL=$(terraform output -raw alb_dns_name)
+ALB_URL=$(cd terraform && terraform output -raw alb_dns_name)
 
-# Test root endpoint
+# Test endpoints
 curl http://$ALB_URL
-
-# Test health endpoint
 curl http://$ALB_URL/health
 ```
 
-## Redeployment
+## Configuration
 
-After making code changes:
+### HTTPS (Optional)
 
-```bash
-./redeploy.sh
+To enable HTTPS, you need an ACM certificate:
 
-# Or with specific tag
-./redeploy.sh v1.2.3
+1. Create or import a certificate in ACM
+2. Create `terraform/terraform.tfvars`:
+
+```hcl
+enable_https    = true
+certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/..."
 ```
 
 This will:
-1. Build new Docker image with tag (git SHA or timestamp)
-2. Push to ECR with new tag + update `latest`
-3. Force ECS service to deploy new tasks
+- Enable HTTPS listener on port 443
+- Redirect HTTP to HTTPS
+- Use TLS 1.3 security policy
+
+### WAF Protection (Optional)
+
+WAF can be enabled for additional security:
+
+```hcl
+enable_waf = true
+```
+
+Features when enabled:
+- Rate limiting (2000 requests per 5 min per IP)
+- AWS managed IP reputation list
+- Known bad inputs protection
+
+Note: WAF logging requires additional Kinesis Firehose setup.
+
+### Auto-scaling
+
+Auto-scaling is enabled by default:
+- Min tasks: 2
+- Max tasks: 4
+- CPU target: 70%
+- Memory target: 80%
+
+Customize in `terraform.tfvars`:
+```hcl
+autoscaling_min_capacity = 1
+autoscaling_max_capacity = 10
+```
+
+### CloudWatch Alarms
+
+Alarms are enabled by default for:
+- High CPU utilization (>80%)
+- High memory utilization (>80%)
+- High response time (>1s)
+- Unhealthy targets
+
+Optional: Add SNS topic for notifications:
+```hcl
+alarm_sns_topic_arn = "arn:aws:sns:us-east-1:123456789012:alerts"
+```
 
 ## Local Development
 
 ```bash
+cd app
 pip install -r requirements.txt
 uvicorn app:app --reload
 ```

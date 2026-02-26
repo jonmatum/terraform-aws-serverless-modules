@@ -4,15 +4,14 @@ FastAPI and Node MCP services behind API Gateway with VPC Link.
 
 ## Architecture
 
-```mermaid
-graph TB
-    Client[Client] --> APIGW[API Gateway HTTP API]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> ALB1[ALB FastAPI]
-    VPCLink --> ALB2[ALB MCP]
-    ALB1 --> ECS1[ECS FastAPI Service]
-    ALB2 --> ECS2[ECS MCP Service]
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- API Gateway routing
+- Terraform resource relationships
+- Request flow sequences
+- Service isolation
+- Deployment strategies
+- Cost breakdown
 
 ## Features
 

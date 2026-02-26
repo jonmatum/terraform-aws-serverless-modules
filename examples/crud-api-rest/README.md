@@ -4,17 +4,12 @@ Complete CRUD application with FastAPI backend, DynamoDB, API Gateway REST API w
 
 ## Architecture
 
-```mermaid
-graph LR
-    Client[Client] --> CF[CloudFront]
-    CF --> S3[S3 React App]
-    Client --> APIGW[API Gateway REST API v1]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> NLB[Network Load Balancer]
-    NLB --> ALB[Application Load Balancer]
-    ALB --> ECS[ECS Fargate FastAPI]
-    ECS --> DDB[DynamoDB]
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- CRUD operations flow
+- Terraform resource relationships
+- Deployment flow
+- Cost breakdown
 
 **Note**: API Gateway REST API v1 requires NLB for VPC Link (AWS limitation). The NLB forwards traffic to ALB, which then routes to ECS. This adds ~$16/month for the NLB and 1-3ms latency. For cost optimization, consider using API Gateway HTTP API (v2) which supports ALB directly.
 

@@ -4,14 +4,12 @@ FastAPI application with automatic OpenAPI schema import to API Gateway HTTP API
 
 ## Architecture
 
-```mermaid
-graph LR
-    Client[Client] --> APIGW[API Gateway HTTP API v2]
-    APIGW --> VPCLink[VPC Link]
-    VPCLink --> NLB[Network Load Balancer]
-    NLB --> ECS[ECS Fargate FastAPI]
-    ECS -.-> OpenAPI[OpenAPI 3.0 Schema]
-```
+See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+- High-level architecture
+- OpenAPI integration flow
+- Request validation
+- Terraform resource relationships
+- Cost breakdown
 
 ## Features
 
