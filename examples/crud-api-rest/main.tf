@@ -244,6 +244,7 @@ resource "aws_iam_role_policy" "ecs_task_dynamodb" {
       {
         Effect = "Allow"
         Action = [
+          "dynamodb:DescribeTable",
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",

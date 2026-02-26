@@ -8,6 +8,7 @@ from boto3.dynamodb.conditions import Key
 import os
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
 # Initialize FastAPI
 app = FastAPI(
@@ -16,7 +17,8 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    root_path="/prod"
 )
 
 # CORS middleware
@@ -32,6 +34,16 @@ app.add_middleware(
 dynamodb = boto3.resource('dynamodb', region_name=os.getenv('AWS_REGION', 'us-east-1'))
 table_name = os.getenv('DYNAMODB_TABLE_NAME', 'items')
 table = dynamodb.Table(table_name)
+
+# Helper function to convert Decimal to float
+def decimal_to_float(obj):
+    if isinstance(obj, list):
+        return [decimal_to_float(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: decimal_to_float(v) for k, v in obj.items()}
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    return obj
 
 # Pydantic models
 class ItemBase(BaseModel):
@@ -95,8 +107,14 @@ async def create_item(item: ItemCreate):
             "created_at": timestamp,
             "updated_at": timestamp
         }
+        
+        # Convert float to Decimal for DynamoDB
+        item_data["price"] = Decimal(str(item_data["price"]))
 
         table.put_item(Item=item_data)
+        
+        # Convert back to float for response
+        item_data["price"] = float(item_data["price"])
         return Item(**item_data)
     except Exception as e:
         raise HTTPException(
@@ -115,7 +133,7 @@ async def list_items(limit: int = 100, last_key: Optional[str] = None):
             scan_kwargs["ExclusiveStartKey"] = {"id": last_key}
 
         response = table.scan(**scan_kwargs)
-        items = [Item(**item) for item in response.get('Items', [])]
+        items = [Item(**decimal_to_float(item)) for item in response.get('Items', [])]
 
         return items
     except Exception as e:
@@ -137,7 +155,7 @@ async def get_item(item_id: str):
                 detail=f"Item with id {item_id} not found"
             )
 
-        return Item(**response['Item'])
+        return Item(**decimal_to_float(response['Item']))
     except HTTPException:
         raise
     except Exception as e:
@@ -162,9 +180,13 @@ async def update_item(item_id: str, item_update: ItemUpdate):
         # Build update expression
         update_data = {k: v for k, v in item_update.model_dump().items() if v is not None}
         if not update_data:
-            return Item(**response['Item'])
+            return Item(**decimal_to_float(response['Item']))
 
         update_data["updated_at"] = datetime.utcnow().isoformat() + "Z"
+        
+        # Convert float to Decimal for DynamoDB
+        if "price" in update_data:
+            update_data["price"] = Decimal(str(update_data["price"]))
 
         update_expression = "SET " + ", ".join([f"#{k} = :{k}" for k in update_data.keys()])
         expression_attribute_names = {f"#{k}": k for k in update_data.keys()}
@@ -178,7 +200,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
             ReturnValues="ALL_NEW"
         )
 
-        return Item(**response['Attributes'])
+        return Item(**decimal_to_float(response['Attributes']))
     except HTTPException:
         raise
     except Exception as e:
