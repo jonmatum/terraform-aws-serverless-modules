@@ -10,7 +10,7 @@ Terraform modules for deploying serverless and container-based applications on A
 
 ## Well-Architected Framework
 
-Built following [AWS Well-Architected Framework](./docs/well-architected.md) best practices:
+Built following [AWS Well-Architected Framework](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/docs/well-architected.md) best practices:
 
 - **Security**: Encryption at rest/transit, least-privilege IAM, VPC endpoints, WAF
 - **Reliability**: Multi-AZ deployment, auto-scaling, health checks, monitoring
@@ -44,16 +44,17 @@ module "ecs" {
 
 | Module | Description | Key Features |
 |--------|-------------|--------------|
-| [vpc](./modules/vpc/) | Multi-AZ VPC | NAT gateways, VPC endpoints, flow logs |
-| [ecr](./modules/ecr/) | Container registry | Encryption, lifecycle policies, image scanning |
-| [ecs](./modules/ecs/) | Fargate service | Auto-scaling, Container Insights, Spot support |
-| [alb](./modules/alb/) | Application Load Balancer | Access logs, HTTPS, health checks |
-| [dynamodb](./modules/dynamodb/) | NoSQL database | Encryption, PITR, auto-scaling |
-| [api-gateway](./modules/api-gateway/) | HTTP API (v2) | Throttling, logging, X-Ray tracing |
-| [api-gateway-v1](./modules/api-gateway-v1/) | REST API | OpenAPI/Swagger support, VPC Link |
-| [cloudfront-s3](./modules/cloudfront-s3/) | CDN + Static hosting | SPA routing, OAC, custom domains |
-| [waf](./modules/waf/) | Web Application Firewall | Rate limiting, IP filtering, managed rules |
-| [cloudwatch-alarms](./modules/cloudwatch-alarms/) | Monitoring | CPU, memory, response time, error rates |
+| [vpc](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/vpc) | Multi-AZ VPC | NAT gateways, VPC endpoints, flow logs |
+| [ecr](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecr) | Container registry | Encryption, lifecycle policies, image scanning |
+| [ecs](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs) | Fargate service | Auto-scaling, Container Insights, Spot support |
+| [lambda](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/lambda) | Lambda function | Container images, DLQ, retry policies, alarms |
+| [alb](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/alb) | Application Load Balancer | Access logs, HTTPS, health checks |
+| [dynamodb](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/dynamodb) | NoSQL database | Encryption, PITR, auto-scaling |
+| [api-gateway](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway) | HTTP API (v2) | Throttling, logging, X-Ray tracing |
+| [api-gateway-v1](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway-v1) | REST API | OpenAPI/Swagger support, VPC Link |
+| [cloudfront-s3](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/cloudfront-s3) | CDN + Static hosting | SPA routing, OAC, custom domains |
+| [waf](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/waf) | Web Application Firewall | Rate limiting, IP filtering, managed rules |
+| [cloudwatch-alarms](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/cloudwatch-alarms) | Monitoring | CPU, memory, response time, error rates |
 
 ## Quick Start
 
@@ -62,6 +63,9 @@ module "ecs" {
 ```bash
 # Simple ECS application
 cd examples/ecs-app
+
+# Containerized Lambda function
+cd examples/lambda-function
 
 # Multi-service API Gateway
 cd examples/api-gateway-multi-service
@@ -95,14 +99,15 @@ terraform destroy -auto-approve
 
 | Example | Description | Architecture | Components |
 |---------|-------------|--------------|------------|
-| [ecs-app](./examples/ecs-app/) | Basic web app | ALB + ECS | VPC, ALB, ECS, ECR |
-| [api-gateway-multi-service](./examples/api-gateway-multi-service/) | Microservices | API Gateway + ECS | API Gateway, VPC Link, ECS, ALB |
-| [crud-api-rest](./examples/crud-api-rest/) | Full-stack CRUD | REST API + DynamoDB | API Gateway v1, ECS, DynamoDB, React |
-| [crud-api-http](./examples/crud-api-http/) | Optimized CRUD | HTTP API + DynamoDB | API Gateway v2, ECS, DynamoDB, React |
-| [mcp-agent-runtime](./examples/mcp-agent-runtime/) | MCP Server | ECS + Agent Gateway | ECS, ALB, MCP Protocol |
-| [rest-api-service](./examples/rest-api-service/) | Private API | REST API + VPC Link | API Gateway v1, VPC Link, ECS |
-| [openapi-http-api](./examples/openapi-http-api/) | Modern API | HTTP API + OpenAPI | API Gateway v2, OpenAPI 3.0, ECS |
-| [openapi-rest-api](./examples/openapi-rest-api/) | Traditional API | REST API + Swagger | API Gateway v1, Swagger 2.0, ECS |
+| [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app) | Basic web app | ALB + ECS | VPC, ALB, ECS, ECR |
+| [lambda-function](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/lambda-function) | Containerized Lambda | Lambda Function URL | Lambda, ECR, CloudWatch, SNS, SQS |
+| [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) | Microservices | API Gateway + ECS | API Gateway, VPC Link, ECS, ALB |
+| [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) | Full-stack CRUD | REST API + DynamoDB | API Gateway v1, ECS, DynamoDB, React |
+| [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) | Optimized CRUD | HTTP API + DynamoDB | API Gateway v2, ECS, DynamoDB, React |
+| [mcp-agent-runtime](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/mcp-agent-runtime) | MCP Server | ECS + Agent Gateway | ECS, ALB, MCP Protocol |
+| [rest-api-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service) | Private API | REST API + VPC Link | API Gateway v1, VPC Link, ECS |
+| [openapi-http-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-http-api) | Modern API | HTTP API + OpenAPI | API Gateway v2, OpenAPI 3.0, ECS |
+| [openapi-rest-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-rest-api) | Traditional API | REST API + Swagger | API Gateway v1, Swagger 2.0, ECS |
 
 ### Architecture Patterns
 
@@ -280,13 +285,13 @@ cd modules/vpc
 terraform-docs markdown table --output-file README.md --output-mode inject .
 ```
 
-The pre-commit hooks ensure that all Terraform documentation (inputs, outputs, providers, requirements) is automatically generated and kept up to date. See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed development guidelines.
+The pre-commit hooks ensure that all Terraform documentation (inputs, outputs, providers, requirements) is automatically generated and kept up to date. See [CONTRIBUTING.md](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/CONTRIBUTING.md) for detailed development guidelines.
 
 ## Documentation
 
-- [Well-Architected Framework](./docs/well-architected.md) - Architecture details and best practices
-- [Module Documentation](./modules/) - Individual module README files
-- [Example Guides](./examples/) - Step-by-step deployment guides
+- [Well-Architected Framework](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/docs/well-architected.md) - Architecture details and best practices
+- [Module Documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules) - Individual module README files
+- [Example Guides](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples) - Step-by-step deployment guides
 
 ## Contributing
 

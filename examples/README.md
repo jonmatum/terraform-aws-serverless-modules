@@ -6,11 +6,19 @@ This directory contains practical examples demonstrating how to use the Terrafor
 
 ## Learning Path
 
-### 1. Foundation: Basic ECS Deployment
+### 1. Foundation: Basic Deployments
 
-Start here to understand the core ECS deployment pattern.
+Start here to understand core deployment patterns.
 
-#### [ecs-app](./ecs-app/)
+#### [lambda-function](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/lambda-function)
+Containerized Lambda function with Function URL. Learn the basics of:
+- Lambda container image deployment
+- Function URL with CORS
+- CloudWatch monitoring and alarms
+- Dead Letter Queue (DLQ) for failed invocations
+- Production reliability features (optional)
+
+#### [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app)
 Simple FastAPI application on ECS with ALB. Learn the basics of:
 - ECS Fargate deployment
 - Application Load Balancer setup
@@ -21,7 +29,7 @@ Simple FastAPI application on ECS with ALB. Learn the basics of:
 
 Learn how to expose services through API Gateway.
 
-#### [rest-api-service](./rest-api-service/)
+#### [rest-api-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service)
 FastAPI behind API Gateway REST API (v1) with VPC Link. Introduces:
 - API Gateway REST API (v1)
 - VPC Link with Network Load Balancer
@@ -32,14 +40,14 @@ FastAPI behind API Gateway REST API (v1) with VPC Link. Introduces:
 
 Automate API Gateway configuration from OpenAPI specifications.
 
-#### [openapi-rest-api](./openapi-rest-api/)
+#### [openapi-rest-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-rest-api)
 FastAPI with automatic OpenAPI schema import to REST API. Learn:
 - OpenAPI 3.0 to Swagger 2.0 conversion
 - Automatic API Gateway configuration from schema
 - CRUD endpoint patterns
 - Schema-driven development
 
-#### [openapi-http-api](./openapi-http-api/)
+#### [openapi-http-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-http-api)
 FastAPI with OpenAPI schema import to HTTP API (v2). Demonstrates:
 - HTTP API (v2) with OpenAPI
 - Direct ALB integration (no NLB needed)
@@ -50,7 +58,7 @@ FastAPI with OpenAPI schema import to HTTP API (v2). Demonstrates:
 
 Complete applications with frontend, backend, and database.
 
-#### [crud-api-rest](./crud-api-rest/)
+#### [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest)
 Full CRUD app with REST API, React frontend, and DynamoDB. Features:
 - React frontend on CloudFront + S3
 - FastAPI backend with DynamoDB
@@ -60,7 +68,7 @@ Full CRUD app with REST API, React frontend, and DynamoDB. Features:
 
 **Architecture**: `CloudFront → API Gateway REST → NLB → ALB → ECS → DynamoDB`
 
-#### [crud-api-http](./crud-api-http/)
+#### [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http)
 **Optimized** CRUD app using HTTP API (v2). Same features as above but:
 - 71% cheaper than REST API
 - Direct ALB integration (no NLB)
@@ -69,11 +77,9 @@ Full CRUD app with REST API, React frontend, and DynamoDB. Features:
 
 **Architecture**: `CloudFront → API Gateway HTTP → ALB → ECS → DynamoDB`
 
-📖 See [CRUD_API_COMPARISON.md](./CRUD_API_COMPARISON.md) for detailed comparison.
-
 ### 5. Advanced Patterns
 
-#### [api-gateway-multi-service](./api-gateway-multi-service/)
+#### [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service)
 Multiple services behind a single API Gateway. Learn:
 - Multi-service architecture
 - Path-based routing to different services
@@ -84,7 +90,7 @@ Multiple services behind a single API Gateway. Learn:
 - `/api/fastapi/*` → FastAPI service
 - `/api/mcp/*` → Node MCP service
 
-#### [mcp-agent-runtime](./mcp-agent-runtime/)
+#### [mcp-agent-runtime](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/mcp-agent-runtime)
 Model Context Protocol (MCP) server with Bedrock AgentCore Gateway. Advanced topics:
 - Amazon Bedrock AgentCore Gateway integration
 - MCP protocol implementation
@@ -143,17 +149,23 @@ terraform destroy
 
 ## Architecture Patterns
 
+### Serverless Function
+```
+Internet → Lambda Function URL
+```
+Example: [lambda-function](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/lambda-function)
+
 ### Simple Service
 ```
 Internet → ALB → ECS (Fargate)
 ```
-Example: [ecs-app](./ecs-app/)
+Example: [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app)
 
 ### API Gateway + Private Service
 ```
 Internet → API Gateway → VPC Link → NLB/ALB → ECS
 ```
-Examples: [rest-api-service](./rest-api-service/), [openapi-http-api](./openapi-http-api/)
+Examples: [rest-api-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service), [openapi-http-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-http-api)
 
 ### Full-Stack Application
 ```
@@ -161,13 +173,13 @@ Internet → CloudFront → S3 (Frontend)
               ↓
          API Gateway → VPC Link → ECS (Backend) → DynamoDB
 ```
-Examples: [crud-api-rest](./crud-api-rest/), [crud-api-http](./crud-api-http/)
+Examples: [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest), [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http)
 
 ### Multi-Service Gateway
 ```
 Internet → API Gateway → VPC Link → ALB → Multiple ECS Services
 ```
-Example: [api-gateway-multi-service](./api-gateway-multi-service/)
+Example: [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service)
 
 ## Cost Optimization Tips
 
