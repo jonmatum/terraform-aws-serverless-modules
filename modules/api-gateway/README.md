@@ -37,8 +37,8 @@ module "api_gateway" {
 
 ## Examples
 
-- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service architecture
-- [crud-api-http](../../examples/crud-api-http/) - CRUD API with HTTP API
+- [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) - Multi-service architecture
+- [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) - CRUD API with HTTP API
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

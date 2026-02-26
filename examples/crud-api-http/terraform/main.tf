@@ -18,7 +18,7 @@ data "aws_availability_zones" "available" {
 
 # VPC
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
   name               = "${var.project_name}-vpc"
   cidr               = "10.0.0.0/16"
@@ -26,14 +26,14 @@ module "vpc" {
   private_subnets    = ["10.0.1.0/24", "10.0.2.0/24"]
   public_subnets     = ["10.0.101.0/24", "10.0.102.0/24"]
   enable_nat_gateway = true
-  single_nat_gateway = true # Set to false for production
+  single_nat_gateway = true
 
   tags = var.tags
 }
 
 # DynamoDB Table
 module "dynamodb" {
-  source = "../../modules/dynamodb"
+  source = "../../../modules/dynamodb"
 
   table_name                    = "${var.project_name}-items"
   hash_key                      = "id"
@@ -46,7 +46,7 @@ module "dynamodb" {
 
 # ECR Repository
 module "ecr" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name = "${var.project_name}-api"
   tags            = var.tags
@@ -54,7 +54,7 @@ module "ecr" {
 
 # ALB
 module "alb" {
-  source = "../../modules/alb"
+  source = "../../../modules/alb"
 
   name              = "${var.project_name}-alb"
   internal          = true
@@ -68,7 +68,7 @@ module "alb" {
 
 # ECS Service
 module "ecs" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = "${var.project_name}-api"
@@ -99,37 +99,45 @@ module "ecs" {
   tags = var.tags
 }
 
-# API Gateway REST API (v1) with Swagger
-module "api_gateway_rest" {
-  source = "../../modules/api-gateway-v1"
+# API Gateway HTTP API (v2) - Direct to ALB
+module "api_gateway" {
+  source = "../../../modules/api-gateway"
 
-  name                = "${var.project_name}-api"
-  vpc_link_subnet_ids = module.vpc.private_subnet_ids
-  alb_arn             = module.alb.alb_arn
-  vpc_id              = module.vpc.vpc_id
-  health_check_path   = "/health"
+  name                        = "${var.project_name}-api"
+  vpc_link_subnet_ids         = module.vpc.private_subnet_ids
+  vpc_link_security_group_ids = [aws_security_group.vpc_link.id]
 
-  # OpenAPI/Swagger specification
-  openapi_spec = templatefile("${path.module}/swagger.json", {
-    api_title       = "${var.project_name} API"
-    api_description = "CRUD API for managing items"
-    vpc_link_id     = "" # Will be replaced by module
-    alb_dns         = module.alb.alb_dns_name
-  })
+  integrations = {
+    proxy = {
+      method          = "ANY"
+      route_key       = "ANY /{proxy+}"
+      connection_type = "VPC_LINK"
+      uri             = module.alb.listener_arn
+    }
+    root = {
+      method          = "GET"
+      route_key       = "GET /"
+      connection_type = "VPC_LINK"
+      uri             = module.alb.listener_arn
+    }
+  }
+
+  enable_access_logs  = true
+  enable_xray_tracing = true
 
   tags = var.tags
 
   depends_on = [module.alb]
 }
 
-# WAF (optional) - attach separately
+# WAF (optional)
 module "waf" {
   count  = var.enable_waf ? 1 : 0
-  source = "../../modules/waf"
+  source = "../../../modules/waf"
 
   name         = "${var.project_name}-waf"
   scope        = "REGIONAL"
-  resource_arn = module.api_gateway_rest.stage_arn
+  resource_arn = module.api_gateway.stage_arn
 
   enable_rate_limiting    = true
   rate_limit              = 2000
@@ -141,7 +149,7 @@ module "waf" {
 
 # CloudFront + S3 for React App
 module "cloudfront" {
-  source = "../../modules/cloudfront-s3"
+  source = "../../../modules/cloudfront-s3"
 
   name           = "${var.project_name}-web"
   enable_logging = true
@@ -201,21 +209,12 @@ resource "aws_iam_role_policy" "ecs_execution_custom" {
           "ecr:GetAuthorizationToken"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage"
-        ]
-        Resource = module.ecr.repository_arn
       }
     ]
   })
 }
 
-# IAM Role for ECS Task (DynamoDB access)
+# IAM Role for ECS Task
 resource "aws_iam_role" "ecs_task" {
   name = "${var.project_name}-ecs-task-role"
 
@@ -251,16 +250,13 @@ resource "aws_iam_role_policy" "ecs_task_dynamodb" {
           "dynamodb:Query",
           "dynamodb:Scan"
         ]
-        Resource = [
-          module.dynamodb.table_arn,
-          "${module.dynamodb.table_arn}/*"
-        ]
+        Resource = module.dynamodb.table_arn
       }
     ]
   })
 }
 
-# Security Groups
+# Security Group for ECS Tasks
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-ecs-tasks"
   description = "Security group for ECS tasks"
@@ -271,7 +267,6 @@ resource "aws_security_group" "ecs_tasks" {
     to_port         = 8000
     protocol        = "tcp"
     security_groups = [module.alb.alb_security_group_id]
-    description     = "Allow traffic from ALB"
   }
 
   egress {
@@ -279,12 +274,14 @@ resource "aws_security_group" "ecs_tasks" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-ecs-tasks"
+  })
 }
 
+# Security Group for VPC Link
 resource "aws_security_group" "vpc_link" {
   name        = "${var.project_name}-vpc-link"
   description = "Security group for API Gateway VPC Link"
@@ -295,12 +292,14 @@ resource "aws_security_group" "vpc_link" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-vpc-link"
+  })
 }
 
+# Allow VPC Link to ALB
 resource "aws_security_group_rule" "vpc_link_to_alb" {
   type                     = "ingress"
   from_port                = 80
@@ -308,5 +307,5 @@ resource "aws_security_group_rule" "vpc_link_to_alb" {
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.vpc_link.id
   security_group_id        = module.alb.alb_security_group_id
-  description              = "Allow traffic from VPC Link"
+  description              = "Allow traffic from VPC Link to ALB"
 }

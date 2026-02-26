@@ -4,7 +4,7 @@ FastAPI and Node MCP services behind API Gateway with VPC Link.
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - API Gateway routing
 - Terraform resource relationships
@@ -29,20 +29,10 @@ See [detailed architecture documentation](./architecture.md) for comprehensive d
 ./deploy.sh
 ```
 
-### Redeploy All Services
+### Redeploy with Specific Tag
 
 ```bash
-# Redeploy both services with auto-generated tag
-./redeploy.sh
-
-# Redeploy with specific tag
-IMAGE_TAG=v1.2.3 ./redeploy.sh
-
-# Redeploy only FastAPI
-./redeploy.sh fastapi
-
-# Redeploy only MCP
-./redeploy.sh mcp
+./deploy.sh v1.2.3
 ```
 
 ### CI/CD Usage
@@ -50,15 +40,14 @@ IMAGE_TAG=v1.2.3 ./redeploy.sh
 ```bash
 # In GitHub Actions or other CI/CD
 export AWS_REGION=us-east-1
-export IMAGE_TAG=$GITHUB_SHA
-./redeploy.sh
+./deploy.sh $GITHUB_SHA
 ```
 
 ## Testing
 
 ```bash
 # Get API endpoint
-API_ENDPOINT=$(terraform output -raw api_endpoint)
+API_ENDPOINT=$(cd terraform && terraform output -raw api_endpoint)
 
 # Test FastAPI
 curl $API_ENDPOINT/api/fastapi

@@ -29,8 +29,8 @@ module "alb" {
 
 ## Examples
 
-- [ecs-app](../../examples/ecs-app/) - Basic ECS application with ALB
-- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service with ALB
+- [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app) - Basic ECS application with ALB
+- [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) - Multi-service with ALB
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

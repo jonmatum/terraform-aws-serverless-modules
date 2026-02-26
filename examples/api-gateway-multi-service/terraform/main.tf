@@ -17,7 +17,7 @@ data "aws_availability_zones" "available" {
 }
 
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
   name               = "${var.project_name}-vpc"
   cidr               = "10.0.0.0/16"
@@ -32,27 +32,27 @@ module "vpc" {
 
 # FastAPI Service
 module "ecr_fastapi" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name = "${var.project_name}-fastapi"
   tags            = var.tags
 }
 
 module "alb_fastapi" {
-  source = "../../modules/alb"
+  source = "../../../modules/alb"
 
   name              = "${var.project_name}-fastapi-alb"
   internal          = true
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.private_subnet_ids
   target_port       = 8000
-  health_check_path = "/api/fastapi/health"
+  health_check_path = "/health"
 
   tags = var.tags
 }
 
 module "ecs_fastapi" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = "${var.project_name}-fastapi"
@@ -73,27 +73,27 @@ module "ecs_fastapi" {
 
 # MCP Service
 module "ecr_mcp" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name = "${var.project_name}-mcp"
   tags            = var.tags
 }
 
 module "alb_mcp" {
-  source = "../../modules/alb"
+  source = "../../../modules/alb"
 
   name              = "${var.project_name}-mcp-alb"
   internal          = true
   vpc_id            = module.vpc.vpc_id
   subnet_ids        = module.vpc.private_subnet_ids
   target_port       = 3000
-  health_check_path = "/api/mcp/health"
+  health_check_path = "/health"
 
   tags = var.tags
 }
 
 module "ecs_mcp" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = "${var.project_name}-mcp"
@@ -114,7 +114,7 @@ module "ecs_mcp" {
 
 # API Gateway
 module "api_gateway" {
-  source = "../../modules/api-gateway"
+  source = "../../../modules/api-gateway"
 
   name                        = "${var.project_name}-api"
   vpc_link_subnet_ids         = module.vpc.private_subnet_ids
@@ -127,9 +127,21 @@ module "api_gateway" {
       connection_type = "VPC_LINK"
       uri             = module.alb_fastapi.listener_arn
     }
+    fastapi_root = {
+      method          = "ANY"
+      route_key       = "ANY /api/fastapi"
+      connection_type = "VPC_LINK"
+      uri             = module.alb_fastapi.listener_arn
+    }
     mcp = {
       method          = "ANY"
       route_key       = "ANY /api/mcp/{proxy+}"
+      connection_type = "VPC_LINK"
+      uri             = module.alb_mcp.listener_arn
+    }
+    mcp_root = {
+      method          = "ANY"
+      route_key       = "ANY /api/mcp"
       connection_type = "VPC_LINK"
       uri             = module.alb_mcp.listener_arn
     }

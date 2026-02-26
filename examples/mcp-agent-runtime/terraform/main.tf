@@ -22,7 +22,7 @@ data "aws_availability_zones" "available" {
 
 # VPC
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
   name                 = "${var.project_name}-vpc"
   cidr                 = "10.0.0.0/16"
@@ -38,7 +38,7 @@ module "vpc" {
 
 # ECR Repository
 module "ecr" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name      = "${var.project_name}-mcp"
   image_tag_mutability = "MUTABLE"
@@ -248,7 +248,7 @@ resource "aws_bedrockagentcore_gateway_target" "mcp_server" {
 
 # ALB
 module "alb" {
-  source = "../../modules/alb"
+  source = "../../../modules/alb"
 
   name        = "${var.project_name}-alb"
   vpc_id      = module.vpc.vpc_id
@@ -267,7 +267,7 @@ module "alb" {
 
 # ECS Cluster and Service
 module "ecs" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = "${var.project_name}-mcp-task"
@@ -313,7 +313,7 @@ module "ecs" {
 
 # CloudWatch Alarms
 module "cloudwatch_alarms" {
-  source = "../../modules/cloudwatch-alarms"
+  source = "../../../modules/cloudwatch-alarms"
 
   cluster_name = var.project_name
   service_name = module.ecs.service_name

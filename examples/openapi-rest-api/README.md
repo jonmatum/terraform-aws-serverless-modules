@@ -4,7 +4,7 @@ FastAPI application with automatic OpenAPI schema import to API Gateway REST API
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-rest-api/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - Swagger integration flow
 - OpenAPI to Swagger conversion

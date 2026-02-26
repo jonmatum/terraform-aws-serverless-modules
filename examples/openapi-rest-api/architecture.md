@@ -150,8 +150,8 @@ graph LR
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [API Gateway v1 Module](../../modules/api-gateway-v1/)
-- [ECS Module](../../modules/ecs/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-rest-api/README.md)
+- [API Gateway v1 Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway-v1)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
 - [Swagger 2.0 Specification](https://swagger.io/specification/v2/)
 - [OpenAPI 3.0 Specification](https://spec.openapis.org/oas/v3.0.0)

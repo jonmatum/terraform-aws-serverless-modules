@@ -44,8 +44,8 @@ module "api_gateway_rest" {
 
 ## Examples
 
-- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with REST API
-- [rest-api-service](../../examples/rest-api-service/) - REST API service
+- [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) - CRUD API with REST API
+- [rest-api-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service) - REST API service
 
 ## Well-Architected Considerations
 

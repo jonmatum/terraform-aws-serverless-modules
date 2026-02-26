@@ -26,8 +26,8 @@ module "ecr" {
 
 ## Examples
 
-- [ecs-app](../../examples/ecs-app/) - Basic ECS application with ECR
-- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service with ECR
+- [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app) - Basic ECS application with ECR
+- [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) - Multi-service with ECR
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

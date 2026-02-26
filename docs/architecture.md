@@ -169,6 +169,6 @@ graph LR
 
 ## Related Documentation
 
-- [Well-Architected Framework](./well-architected.md)
-- [Module Documentation](../modules/)
-- [Example Implementations](../examples/)
+- [Well-Architected Framework](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/docs/well-architected.md)
+- [Module Documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules)
+- [Example Implementations](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples)

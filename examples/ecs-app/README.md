@@ -4,7 +4,7 @@ Simple FastAPI application deployed to ECS with ALB.
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - Terraform resource relationships
 - Request flow sequences

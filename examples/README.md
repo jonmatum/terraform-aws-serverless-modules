@@ -79,6 +79,17 @@ Full CRUD app with REST API, React frontend, and DynamoDB. Features:
 
 ### 5. Advanced Patterns
 
+#### [agentcore-full](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/agentcore-full)
+Comprehensive AWS Bedrock AgentCore example with all capabilities. Features:
+- Multiple MCP servers (ECS + Lambda)
+- Knowledge Base with OpenSearch Serverless
+- Bedrock Agent with action groups
+- Guardrails (content filtering, PII redaction)
+- AWS Well-Architected Framework compliant
+- All features optional via feature flags
+
+**Requires**: AWS Provider >= 6.18.0
+
 #### [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service)
 Multiple services behind a single API Gateway. Learn:
 - Multi-service architecture
@@ -97,7 +108,7 @@ Model Context Protocol (MCP) server with Bedrock AgentCore Gateway. Advanced top
 - Internal ALB with private ECS
 - Auto-scaling and Spot instances
 
-** Requires**: AWS Provider >= 6.18.0
+**Requires**: AWS Provider >= 6.18.0
 
 ## Quick Start
 
@@ -180,6 +191,16 @@ Examples: [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-m
 Internet → API Gateway → VPC Link → ALB → Multiple ECS Services
 ```
 Example: [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service)
+
+### AgentCore with MCP Servers
+```
+AgentCore Gateway → ECS MCP Server (Fargate)
+                 → Lambda MCP Server (Function URL)
+
+Knowledge Base → S3 + OpenSearch Serverless
+Bedrock Agent → Lambda Actions
+```
+Example: [agentcore-full](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/agentcore-full)
 
 ## Cost Optimization Tips
 

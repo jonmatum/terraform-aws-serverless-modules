@@ -282,8 +282,8 @@ graph LR
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [VPC Module](../../modules/vpc/)
-- [API Gateway Module](../../modules/api-gateway/)
-- [ECS Module](../../modules/ecs/)
-- [ALB Module](../../modules/alb/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service/README.md)
+- [VPC Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/vpc)
+- [API Gateway Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
+- [ALB Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/alb)

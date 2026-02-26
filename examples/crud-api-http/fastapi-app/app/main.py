@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import boto3
 from boto3.dynamodb.conditions import Key
+from decimal import Decimal
 import os
 import uuid
 from datetime import datetime
@@ -89,14 +90,20 @@ async def create_item(item: ItemCreate):
         item_id = str(uuid.uuid4())
         timestamp = datetime.utcnow().isoformat() + "Z"
 
+        item_dict = item.model_dump()
+        item_dict['price'] = Decimal(str(item_dict['price']))
+
         item_data = {
             "id": item_id,
-            **item.model_dump(),
+            **item_dict,
             "created_at": timestamp,
             "updated_at": timestamp
         }
 
         table.put_item(Item=item_data)
+
+        # Convert Decimal back to float for response
+        item_data['price'] = float(item_data['price'])
         return Item(**item_data)
     except Exception as e:
         raise HTTPException(
@@ -115,7 +122,11 @@ async def list_items(limit: int = 100, last_key: Optional[str] = None):
             scan_kwargs["ExclusiveStartKey"] = {"id": last_key}
 
         response = table.scan(**scan_kwargs)
-        items = [Item(**item) for item in response.get('Items', [])]
+        items = []
+        for item in response.get('Items', []):
+            if 'price' in item and isinstance(item['price'], Decimal):
+                item['price'] = float(item['price'])
+            items.append(Item(**item))
 
         return items
     except Exception as e:
@@ -137,7 +148,11 @@ async def get_item(item_id: str):
                 detail=f"Item with id {item_id} not found"
             )
 
-        return Item(**response['Item'])
+        item = response['Item']
+        if 'price' in item and isinstance(item['price'], Decimal):
+            item['price'] = float(item['price'])
+
+        return Item(**item)
     except HTTPException:
         raise
     except Exception as e:
@@ -162,7 +177,14 @@ async def update_item(item_id: str, item_update: ItemUpdate):
         # Build update expression
         update_data = {k: v for k, v in item_update.model_dump().items() if v is not None}
         if not update_data:
-            return Item(**response['Item'])
+            item = response['Item']
+            if 'price' in item and isinstance(item['price'], Decimal):
+                item['price'] = float(item['price'])
+            return Item(**item)
+
+        # Convert price to Decimal if present
+        if 'price' in update_data:
+            update_data['price'] = Decimal(str(update_data['price']))
 
         update_data["updated_at"] = datetime.utcnow().isoformat() + "Z"
 
@@ -178,7 +200,11 @@ async def update_item(item_id: str, item_update: ItemUpdate):
             ReturnValues="ALL_NEW"
         )
 
-        return Item(**response['Attributes'])
+        item = response['Attributes']
+        if 'price' in item and isinstance(item['price'], Decimal):
+            item['price'] = float(item['price'])
+
+        return Item(**item)
     except HTTPException:
         raise
     except Exception as e:

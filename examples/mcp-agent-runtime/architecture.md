@@ -147,8 +147,8 @@ graph TB
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [VPC Module](../../modules/vpc/)
-- [ECS Module](../../modules/ecs/)
-- [ALB Module](../../modules/alb/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/mcp-agent-runtime/README.md)
+- [VPC Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/vpc)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
+- [ALB Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/alb)
 - [MCP Protocol Specification](https://modelcontextprotocol.io/)

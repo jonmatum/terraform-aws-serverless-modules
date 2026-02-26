@@ -220,8 +220,8 @@ graph TB
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [VPC Module](../../modules/vpc/)
-- [ECS Module](../../modules/ecs/)
-- [ALB Module](../../modules/alb/)
-- [WAF Module](../../modules/waf/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app/README.md)
+- [VPC Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/vpc)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
+- [ALB Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/alb)
+- [WAF Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/waf)

@@ -2,80 +2,63 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+TERRAFORM_DIR="$SCRIPT_DIR/terraform"
+APP_DIR="$SCRIPT_DIR/fastapi-app"
 
+IMAGE_TAG=${1:-latest}
 AWS_REGION=${AWS_REGION:-us-east-1}
-IMAGE_TAG=${IMAGE_TAG:-latest}
 
 echo "=== CRUD API (HTTP) Deployment ==="
 echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
 echo ""
 
-# Check prerequisites
-if ! command -v aws &> /dev/null; then
-    echo "Error: AWS CLI is not installed"
-    exit 1
-fi
-
-if ! command -v docker &> /dev/null; then
-    echo "Error: Docker is not installed"
-    exit 1
-fi
+# Change to Terraform directory
+cd "$TERRAFORM_DIR"
 
 # Step 1: Initialize Terraform
 echo "Step 1: Initializing Terraform..."
 terraform init
 
-# Step 2: Create ECR repository
+# Step 2: Apply infrastructure
 echo ""
-echo "Step 2: Creating ECR repository..."
-terraform apply -target=module.ecr -auto-approve
+echo "Step 2: Applying infrastructure..."
+terraform apply -auto-approve
 
 # Get ECR URL
 ECR_URL=$(terraform output -raw ecr_repository_url)
-echo "ECR URL: $ECR_URL"
 
-# Step 3: Login to ECR
+# Step 3: Build and push Docker image
 echo ""
-echo "Step 3: Logging into ECR..."
-aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
+echo "Step 3: Building and pushing Docker image..."
+docker build --platform linux/amd64 -t crud-api:${IMAGE_TAG} "$APP_DIR"
+docker tag crud-api:${IMAGE_TAG} ${ECR_URL}:${IMAGE_TAG}
+docker tag crud-api:${IMAGE_TAG} ${ECR_URL}:latest
 
-# Step 4: Build and push Docker image
-echo ""
-echo "Step 4: Building and pushing Docker image..."
-cd fastapi-app
-docker build --platform linux/amd64 -t $ECR_URL:$IMAGE_TAG .
-docker push $ECR_URL:$IMAGE_TAG
-cd ..
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+docker push ${ECR_URL}:${IMAGE_TAG}
+docker push ${ECR_URL}:latest
 
-# Step 5: Deploy infrastructure
+# Step 4: Force ECS service update
 echo ""
-echo "Step 5: Deploying infrastructure..."
-terraform apply -auto-approve
+echo "Step 4: Updating ECS service..."
 
-# Step 6: Force ECS service update
-echo ""
-echo "Step 6: Forcing ECS service update..."
+# Refresh outputs
+terraform refresh > /dev/null
+
 CLUSTER_NAME=$(terraform output -raw cluster_name)
 SERVICE_NAME=$(terraform output -raw service_name)
 
-aws ecs update-service \
-  --cluster $CLUSTER_NAME \
-  --service $SERVICE_NAME \
-  --force-new-deployment \
-  --region $AWS_REGION \
-  --no-cli-pager > /dev/null
-
-# Step 7: Wait for service to stabilize
-echo ""
-echo "Step 7: Waiting for ECS service to stabilize (this may take 2-3 minutes)..."
-aws ecs wait services-stable \
-  --cluster $CLUSTER_NAME \
-  --services $SERVICE_NAME \
-  --region $AWS_REGION
+aws ecs update-service --region ${AWS_REGION} --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment --no-cli-pager > /dev/null
 
 echo ""
 echo "=== Deployment Complete ==="
+API_ENDPOINT=$(terraform output -raw api_endpoint)
+echo "API Endpoint: ${API_ENDPOINT}"
 echo ""
-terraform output test_commands
+echo "Test commands:"
+echo "  # Create item"
+echo "  curl -X POST ${API_ENDPOINT}/items -H 'Content-Type: application/json' -d '{\"name\":\"Laptop\",\"description\":\"MacBook Pro\",\"price\":2499.99,\"quantity\":10}'"
+echo ""
+echo "  # List items"
+echo "  curl ${API_ENDPOINT}/items"

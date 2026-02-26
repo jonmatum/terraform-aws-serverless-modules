@@ -31,8 +31,8 @@ module "waf" {
 
 ## Examples
 
-- [crud-api-rest](../../examples/crud-api-rest/) - WAF with API Gateway
-- [crud-api-http](../../examples/crud-api-http/) - WAF with HTTP API
+- [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) - WAF with API Gateway
+- [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) - WAF with HTTP API
 
 ## Features
 

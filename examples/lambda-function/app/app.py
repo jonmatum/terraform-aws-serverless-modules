@@ -7,15 +7,15 @@ def handler(event, context):
     Lambda function handler for HTTP requests via Function URL
     """
     print(f"Received event: {json.dumps(event)}")
-    
+
     # Get environment variables
     environment = os.environ.get('ENVIRONMENT', 'unknown')
     log_level = os.environ.get('LOG_LEVEL', 'info')
-    
+
     # Parse request
     http_method = event.get('requestContext', {}).get('http', {}).get('method', 'UNKNOWN')
     path = event.get('rawPath', '/')
-    
+
     # Route handling
     if path == '/health':
         return {
@@ -26,7 +26,7 @@ def handler(event, context):
                 'timestamp': datetime.utcnow().isoformat()
             })
         }
-    
+
     if path == '/info':
         return {
             'statusCode': 200,
@@ -40,7 +40,7 @@ def handler(event, context):
                 'request_id': context.request_id
             })
         }
-    
+
     # Default response
     return {
         'statusCode': 200,

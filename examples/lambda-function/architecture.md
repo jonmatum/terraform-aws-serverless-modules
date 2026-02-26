@@ -71,7 +71,7 @@ This example demonstrates a containerized AWS Lambda function with Function URL 
 
 ### IAM Role
 - **Service**: lambda.amazonaws.com
-- **Policies**: 
+- **Policies**:
   - AWSLambdaBasicExecutionRole (CloudWatch Logs)
   - AWSXRayDaemonWriteAccess (optional)
 

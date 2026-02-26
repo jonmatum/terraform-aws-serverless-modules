@@ -55,8 +55,8 @@ resource "aws_lambda_function" "this" {
 data "aws_region" "current" {}
 
 resource "aws_lambda_function_event_invoke_config" "this" {
-  function_name          = aws_lambda_function.this.function_name
-  maximum_retry_attempts = var.maximum_retry_attempts
+  function_name                = aws_lambda_function.this.function_name
+  maximum_retry_attempts       = var.maximum_retry_attempts
   maximum_event_age_in_seconds = var.maximum_event_age_in_seconds
 
   dynamic "destination_config" {
@@ -96,11 +96,11 @@ resource "aws_lambda_function_url" "this" {
 }
 
 resource "aws_lambda_permission" "function_url" {
-  count         = var.enable_function_url && var.function_url_auth_type == "NONE" ? 1 : 0
-  statement_id  = "FunctionURLAllowPublicAccess"
-  action        = "lambda:InvokeFunctionUrl"
-  function_name = aws_lambda_function.this.function_name
-  principal     = "*"
+  count                  = var.enable_function_url && var.function_url_auth_type == "NONE" ? 1 : 0
+  statement_id           = "FunctionURLAllowPublicAccess"
+  action                 = "lambda:InvokeFunctionUrl"
+  function_name          = aws_lambda_function.this.function_name
+  principal              = "*"
   function_url_auth_type = "NONE"
 }
 

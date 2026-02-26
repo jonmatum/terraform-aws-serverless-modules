@@ -167,7 +167,7 @@ graph TB
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [API Gateway v1 Module](../../modules/api-gateway-v1/)
-- [ECS Module](../../modules/ecs/)
-- [VPC Module](../../modules/vpc/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service/README.md)
+- [API Gateway v1 Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway-v1)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
+- [VPC Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/vpc)

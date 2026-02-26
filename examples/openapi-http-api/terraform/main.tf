@@ -27,12 +27,12 @@ data "aws_availability_zones" "available" {
 # Generate OpenAPI spec from FastAPI using Docker
 resource "null_resource" "generate_openapi" {
   triggers = {
-    app_hash = filemd5("${path.module}/app.py")
+    app_hash = filemd5("${path.module}/../app.py")
   }
 
   provisioner "local-exec" {
     command = <<-EOT
-      cd ${path.module}
+      cd ${path.module}/..
       docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "
         pip install -q fastapi uvicorn && \
         python3 -c \"
@@ -58,7 +58,7 @@ data "local_file" "openapi_spec" {
 }
 
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
   name               = "${var.project_name}-vpc"
   cidr               = "10.0.0.0/16"
@@ -72,14 +72,14 @@ module "vpc" {
 }
 
 module "ecr" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name = var.project_name
   tags            = var.tags
 }
 
 module "ecs" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = var.project_name

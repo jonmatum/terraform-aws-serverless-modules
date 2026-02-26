@@ -204,8 +204,8 @@ graph TB
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [API Gateway v1 Module](../../modules/api-gateway-v1/)
-- [DynamoDB Module](../../modules/dynamodb/)
-- [CloudFront + S3 Module](../../modules/cloudfront-s3/)
-- [ECS Module](../../modules/ecs/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest/README.md)
+- [API Gateway v1 Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway-v1)
+- [DynamoDB Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/dynamodb)
+- [CloudFront + S3 Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/cloudfront-s3)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)

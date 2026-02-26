@@ -67,6 +67,9 @@ cd examples/ecs-app
 # Containerized Lambda function
 cd examples/lambda-function
 
+# Comprehensive AgentCore with MCP servers
+cd examples/agentcore-full
+
 # Multi-service API Gateway
 cd examples/api-gateway-multi-service
 

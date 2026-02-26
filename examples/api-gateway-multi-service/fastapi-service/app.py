@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+app = FastAPI(root_path="/api/fastapi")
 
-@app.get("/api/fastapi")
-@app.get("/api/fastapi/")
+@app.get("/")
 def read_root():
     return {"service": "fastapi", "message": "Hello from FastAPI on ECS!"}
 
-@app.get("/api/fastapi/health")
+@app.get("/health")
 def health_check():
     return {"status": "healthy"}

@@ -27,7 +27,6 @@ terraform apply -target=module.ecr -auto-approve
 
 # Get ECR repository URL
 ECR_REPO=$(terraform output -raw ecr_repository_url)
-FUNCTION_NAME=$(terraform output -raw function_name)
 
 # Step 3: Login to ECR
 echo ""

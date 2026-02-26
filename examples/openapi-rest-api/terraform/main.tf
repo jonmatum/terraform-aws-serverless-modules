@@ -5,6 +5,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
   }
 }
 
@@ -16,8 +24,101 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Generate OpenAPI spec from FastAPI using Docker and convert to Swagger 2.0
+resource "null_resource" "generate_openapi" {
+  triggers = {
+    app_hash = filemd5("${path.module}/../app.py")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      cd ${path.module}/..
+      docker run --rm -v $(pwd):/app -w /app python:3.11-slim sh -c "
+        pip install -q fastapi uvicorn && \
+        python3 -c \"
+import json
+from app import app
+
+spec = app.openapi()
+
+# Helper to convert schema references
+def convert_refs(obj):
+    if isinstance(obj, dict):
+        return {k: convert_refs(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_refs(item) for item in obj]
+    elif isinstance(obj, str) and '#/components/schemas/' in obj:
+        return obj.replace('#/components/schemas/', '#/definitions/')
+    return obj
+
+swagger = {
+    'swagger': '2.0',
+    'info': spec['info'],
+    'host': '${aws_lb.nlb.dns_name}',
+    'basePath': '/',
+    'schemes': ['http'],
+    'paths': {},
+    'definitions': convert_refs(spec.get('components', {}).get('schemas', {}))
+}
+
+for path, methods in spec.get('paths', {}).items():
+    swagger['paths'][path] = {}
+    for method, details in methods.items():
+        if method in ['get', 'post', 'put', 'delete', 'patch']:
+            swagger['paths'][path][method] = {
+                'summary': details.get('summary', ''),
+                'description': details.get('description', ''),
+                'produces': ['application/json'],
+                'responses': {},
+                'x-amazon-apigateway-integration': {
+                    'type': 'http_proxy',
+                    'httpMethod': method.upper(),
+                    'uri': 'http://' + '\$' + '{stageVariables.nlb_dns}' + path,
+                    'connectionType': 'VPC_LINK',
+                    'connectionId': '\$' + '{stageVariables.vpc_link_id}',
+                    'responses': {
+                        'default': {
+                            'statusCode': '200'
+                        }
+                    }
+                }
+            }
+            # Convert responses
+            for status, response in details.get('responses', {}).items():
+                swagger['paths'][path][method]['responses'][status] = {
+                    'description': response.get('description', '')
+                }
+                if 'content' in response and 'application/json' in response['content']:
+                    schema = convert_refs(response['content']['application/json'].get('schema', {}))
+                    swagger['paths'][path][method]['responses'][status]['schema'] = schema
+
+            if 'requestBody' in details:
+                swagger['paths'][path][method]['consumes'] = ['application/json']
+                schema = convert_refs(details['requestBody']['content']['application/json']['schema'])
+                swagger['paths'][path][method]['parameters'] = [{
+                    'in': 'body',
+                    'name': 'body',
+                    'required': True,
+                    'schema': schema
+                }]
+
+with open('openapi.json', 'w') as f:
+    json.dump(swagger, f, indent=2)
+        \"
+      "
+    EOT
+  }
+
+  depends_on = [aws_lb.nlb, aws_api_gateway_vpc_link.this]
+}
+
+data "local_file" "openapi_spec" {
+  filename   = "${path.module}/openapi.json"
+  depends_on = [null_resource.generate_openapi]
+}
+
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/vpc"
 
   name               = "${var.project_name}-vpc"
   cidr               = "10.0.0.0/16"
@@ -31,14 +132,14 @@ module "vpc" {
 }
 
 module "ecr" {
-  source = "../../modules/ecr"
+  source = "../../../modules/ecr"
 
   repository_name = var.project_name
   tags            = var.tags
 }
 
 module "ecs" {
-  source = "../../modules/ecs"
+  source = "../../../modules/ecs"
 
   cluster_name       = "${var.project_name}-cluster"
   task_family        = var.project_name
@@ -77,7 +178,7 @@ resource "aws_lb_target_group" "this" {
   health_check {
     enabled             = true
     protocol            = "HTTP"
-    path                = "/api/health"
+    path                = "/health"
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
@@ -98,7 +199,7 @@ resource "aws_lb_listener" "this" {
   }
 }
 
-# API Gateway REST API with VPC Link
+# API Gateway REST API with OpenAPI spec
 resource "aws_api_gateway_vpc_link" "this" {
   name        = "${var.project_name}-vpc-link"
   target_arns = [aws_lb.nlb.arn]
@@ -108,72 +209,38 @@ resource "aws_api_gateway_vpc_link" "this" {
 
 resource "aws_api_gateway_rest_api" "this" {
   name = var.project_name
+  body = data.local_file.openapi_spec.content
 
   endpoint_configuration {
     types = ["REGIONAL"]
   }
 
   tags = var.tags
-}
 
-resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  parent_id   = aws_api_gateway_rest_api.this.root_resource_id
-  path_part   = "{proxy+}"
-}
-
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.this.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "NONE"
-
-  request_parameters = {
-    "method.request.path.proxy" = true
-  }
-}
-
-resource "aws_api_gateway_integration" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.this.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.proxy.http_method
-
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${aws_lb.nlb.dns_name}/{proxy}"
-  connection_type         = "VPC_LINK"
-  connection_id           = aws_api_gateway_vpc_link.this.id
-
-  request_parameters = {
-    "integration.request.path.proxy" = "method.request.path.proxy"
-  }
+  depends_on = [null_resource.generate_openapi]
 }
 
 resource "aws_api_gateway_deployment" "this" {
   rest_api_id = aws_api_gateway_rest_api.this.id
 
   triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.proxy.id,
-      aws_api_gateway_method.proxy.id,
-      aws_api_gateway_integration.proxy.id,
-    ]))
+    redeployment = sha1(data.local_file.openapi_spec.content)
   }
 
   lifecycle {
     create_before_destroy = true
   }
-
-  depends_on = [
-    aws_api_gateway_method.proxy,
-    aws_api_gateway_integration.proxy,
-  ]
 }
 
 resource "aws_api_gateway_stage" "prod" {
   deployment_id = aws_api_gateway_deployment.this.id
   rest_api_id   = aws_api_gateway_rest_api.this.id
   stage_name    = "prod"
+
+  variables = {
+    nlb_dns     = aws_lb.nlb.dns_name
+    vpc_link_id = aws_api_gateway_vpc_link.this.id
+  }
 
   tags = var.tags
 }

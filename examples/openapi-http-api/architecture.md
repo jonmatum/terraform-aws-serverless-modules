@@ -137,7 +137,7 @@ sequenceDiagram
 
 ## Related Documentation
 
-- [Main README](./README.md)
-- [API Gateway v2 Module](../../modules/api-gateway/)
-- [ECS Module](../../modules/ecs/)
+- [Main README](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-http-api/README.md)
+- [API Gateway v2 Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway)
+- [ECS Module](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs)
 - [OpenAPI 3.0 Specification](https://spec.openapis.org/oas/v3.0.0)

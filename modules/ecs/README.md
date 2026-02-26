@@ -36,9 +36,9 @@ module "ecs" {
 
 ## Examples
 
-- [ecs-app](../../examples/ecs-app/) - Basic ECS application
-- [api-gateway-multi-service](../../examples/api-gateway-multi-service/) - Multi-service architecture
-- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with DynamoDB
+- [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app) - Basic ECS application
+- [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) - Multi-service architecture
+- [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) - CRUD API with DynamoDB
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements

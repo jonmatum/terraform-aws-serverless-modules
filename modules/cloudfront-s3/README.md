@@ -31,8 +31,8 @@ module "cloudfront_s3" {
 
 ## Examples
 
-- [crud-api-rest](../../examples/crud-api-rest/) - React frontend with CloudFront
-- [crud-api-http](../../examples/crud-api-http/) - React frontend with CloudFront
+- [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) - React frontend with CloudFront
+- [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) - React frontend with CloudFront
 
 ## Features
 

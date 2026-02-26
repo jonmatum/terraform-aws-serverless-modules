@@ -4,7 +4,7 @@ FastAPI service behind API Gateway v1 (REST API) with VPC Link and NLB.
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - Private API integration
 - Request flow

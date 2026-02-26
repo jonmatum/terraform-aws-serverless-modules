@@ -4,7 +4,7 @@
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - HTTP API vs REST API comparison
 - CRUD operations flow
@@ -78,7 +78,7 @@ This will:
 
 ```bash
 # Get API endpoint
-export API_URL=$(terraform output -raw api_endpoint)
+export API_URL=$(cd terraform && terraform output -raw api_endpoint)
 
 # Create an item
 curl -X POST $API_URL/items \
@@ -225,8 +225,8 @@ terraform destroy -auto-approve
 ```bash
 # Check ECS service events
 aws ecs describe-services \
-  --cluster $(terraform output -raw cluster_name) \
-  --services $(terraform output -raw service_name)
+  --cluster $(cd terraform && terraform output -raw cluster_name) \
+  --services $(cd terraform && terraform output -raw service_name)
 
 # Check CloudWatch logs
 aws logs tail /ecs/crud-api-http-api --follow
@@ -236,7 +236,7 @@ aws logs tail /ecs/crud-api-http-api --follow
 ```bash
 # Check ALB target health
 aws elbv2 describe-target-health \
-  --target-group-arn $(terraform output -raw target_group_arn)
+  --target-group-arn $(cd terraform && terraform output -raw target_group_arn)
 ```
 
 ### DynamoDB Access Denied

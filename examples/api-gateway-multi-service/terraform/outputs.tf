@@ -39,7 +39,17 @@ output "ecs_fastapi_cluster_name" {
   value       = module.ecs_fastapi.cluster_name
 }
 
+output "ecs_fastapi_service_name" {
+  description = "FastAPI ECS service name"
+  value       = module.ecs_fastapi.service_name
+}
+
 output "ecs_mcp_cluster_name" {
   description = "MCP ECS cluster name"
   value       = module.ecs_mcp.cluster_name
+}
+
+output "ecs_mcp_service_name" {
+  description = "MCP ECS service name"
+  value       = module.ecs_mcp.service_name
 }

@@ -4,7 +4,7 @@ Complete CRUD application with FastAPI backend, DynamoDB, API Gateway REST API w
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - CRUD operations flow
 - Terraform resource relationships
@@ -58,7 +58,7 @@ This will:
 
 ```bash
 # Get API endpoint
-export API_URL=$(terraform output -raw api_endpoint)
+export API_URL=$(cd terraform && terraform output -raw api_endpoint)
 
 # Create an item
 curl -X POST $API_URL/items \
@@ -99,15 +99,15 @@ npm install
 npm run build
 
 # Deploy to S3/CloudFront
-aws s3 sync build/ s3://$(terraform output -raw s3_bucket_name)/ --delete
+aws s3 sync build/ s3://$(cd terraform && terraform output -raw s3_bucket_name)/ --delete
 
 # Invalidate CloudFront cache
 aws cloudfront create-invalidation \
-  --distribution-id $(terraform output -raw cloudfront_distribution_id) \
+  --distribution-id $(cd terraform && terraform output -raw cloudfront_distribution_id) \
   --paths "/*"
 
 # Open frontend
-open $(terraform output -raw cloudfront_url)
+open $(cd terraform && terraform output -raw cloudfront_url)
 ```
 
 ## API Endpoints
@@ -189,8 +189,8 @@ terraform destroy -auto-approve
 ```bash
 # Check ECS service events
 aws ecs describe-services \
-  --cluster $(terraform output -raw cluster_name) \
-  --services $(terraform output -raw service_name)
+  --cluster $(cd terraform && terraform output -raw cluster_name) \
+  --services $(cd terraform && terraform output -raw service_name)
 
 # Check CloudWatch logs
 aws logs tail /ecs/crud-api-rest-api --follow
@@ -200,7 +200,7 @@ aws logs tail /ecs/crud-api-rest-api --follow
 ```bash
 # Check ALB target health
 aws elbv2 describe-target-health \
-  --target-group-arn $(terraform output -raw target_group_arn)
+  --target-group-arn $(cd terraform && terraform output -raw target_group_arn)
 ```
 
 ### DynamoDB Access Denied

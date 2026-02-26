@@ -8,7 +8,7 @@ Model Context Protocol (MCP) server running on ECS Fargate with Amazon Bedrock A
 
 ## Architecture
 
-See [detailed architecture documentation](./architecture.md) for comprehensive diagrams including:
+See [detailed architecture documentation](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/mcp-agent-runtime/architecture.md) for comprehensive diagrams including:
 - High-level architecture
 - MCP protocol flow
 - Terraform resource relationships

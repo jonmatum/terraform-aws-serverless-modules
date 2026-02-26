@@ -4,15 +4,11 @@ const PORT = 3000;
 
 app.use(express.json());
 
-app.get('/api/mcp', (req, res) => {
+app.get('/', (req, res) => {
   res.json({ service: 'mcp', message: 'Hello from Node MCP on ECS!' });
 });
 
-app.get('/api/mcp/', (req, res) => {
-  res.json({ service: 'mcp', message: 'Hello from Node MCP on ECS!' });
-});
-
-app.get('/api/mcp/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
 

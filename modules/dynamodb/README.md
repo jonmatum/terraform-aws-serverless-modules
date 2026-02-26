@@ -35,8 +35,8 @@ module "dynamodb" {
 
 ## Examples
 
-- [crud-api-rest](../../examples/crud-api-rest/) - CRUD API with DynamoDB
-- [crud-api-http](../../examples/crud-api-http/) - HTTP API with DynamoDB
+- [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) - CRUD API with DynamoDB
+- [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) - HTTP API with DynamoDB
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
