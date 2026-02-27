@@ -24,14 +24,16 @@ terraform init
 echo ""
 echo "Step 2: Creating ECR repository..."
 terraform apply -target=module.ecr -auto-approve
+terraform refresh -target=module.ecr > /dev/null
 
 # Get ECR repository URL
 ECR_REPO=$(terraform output -raw ecr_repository_url)
+ECR_REGISTRY=$(echo ${ECR_REPO} | cut -d'/' -f1)
 
 # Step 3: Login to ECR
 echo ""
 echo "Step 3: Logging into ECR..."
-aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
 
 # Step 4: Build and push Docker image
 echo ""

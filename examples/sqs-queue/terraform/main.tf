@@ -51,7 +51,6 @@ module "ecr" {
   repository_name = "${var.project_name}-processor"
   
   enable_lifecycle_policy = true
-  max_image_count        = 5
 
   tags = var.tags
 }

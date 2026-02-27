@@ -23,6 +23,11 @@ output "lambda_function_name" {
   value       = module.lambda.function_name
 }
 
+output "ecr_repository_url" {
+  description = "ECR repository URL"
+  value       = module.ecr.repository_url
+}
+
 output "test_commands" {
   description = "Test commands"
   value = <<-EOT
