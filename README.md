@@ -106,6 +106,7 @@ terraform destroy -auto-approve
 |---------|-------------|--------------|------------|
 | [ecs-app](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/ecs-app) | Basic web app | ALB + ECS | VPC, ALB, ECS, ECR |
 | [lambda-function](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/lambda-function) | Containerized Lambda | Lambda Function URL | Lambda, ECR, CloudWatch, SNS, SQS |
+| [agentcore-full](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/agentcore-full) | AgentCore with MCP | ECS + Lambda + SQS | ECS, Lambda, SQS, SNS, OpenSearch |
 | [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service) | Microservices | API Gateway + ECS | API Gateway, VPC Link, ECS, ALB |
 | [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-rest) | Full-stack CRUD | REST API + DynamoDB | API Gateway v1, ECS, DynamoDB, React |
 | [crud-api-http](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/crud-api-http) | Optimized CRUD | HTTP API + DynamoDB | API Gateway v2, ECS, DynamoDB, React |
@@ -113,6 +114,8 @@ terraform destroy -auto-approve
 | [rest-api-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/rest-api-service) | Private API | REST API + VPC Link | API Gateway v1, VPC Link, ECS |
 | [openapi-http-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-http-api) | Modern API | HTTP API + OpenAPI | API Gateway v2, OpenAPI 3.0, ECS |
 | [openapi-rest-api](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/openapi-rest-api) | Traditional API | REST API + Swagger | API Gateway v1, Swagger 2.0, ECS |
+| [sqs-queue](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sqs-queue) | Message Queue | SQS + DLQ | SQS FIFO, Dead Letter Queue |
+| [sns-fanout](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sns-fanout) | Pub/Sub Messaging | SNS + SQS | SNS Topic, Multiple SQS Subscribers |
 
 ### Architecture Patterns
 
