@@ -22,38 +22,45 @@ resource "aws_bedrockagentcore_gateway" "main" {
   tags = var.tags
 }
 
-# Gateway Target: ECS MCP Server
-resource "aws_bedrockagentcore_gateway_target" "ecs_mcp" {
-  count = var.certificate_arn != "" ? 1 : 0
+# Gateway Targets disabled - MCP servers need proper protocol implementation
+# To enable, implement full MCP protocol in Lambda/ECS servers
+# Then uncomment and configure targets below
 
-  gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
-  name               = "ecs-mcp-server"
-  description        = "ECS-based MCP server on Fargate"
+# # Gateway Target: ECS MCP Server
+# resource "aws_bedrockagentcore_gateway_target" "ecs_mcp" {
+#   count = var.certificate_arn != "" ? 1 : 0
+#
+#   gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
+#   name               = "ecs-mcp-server"
+#   description        = "ECS-based MCP server on Fargate"
+#
+#   target_configuration {
+#     mcp {
+#       mcp_server {
+#         endpoint = "https://${module.alb.alb_dns_name}"
+#       }
+#     }
+#   }
+#
+#   depends_on = [module.ecs_mcp]
+# }
 
-  target_configuration {
-    mcp {
-      mcp_server {
-        endpoint = "https://${module.alb.alb_dns_name}"
-      }
-    }
-  }
-
-  depends_on = [module.ecs_mcp]
-}
-
-# Gateway Target: Lambda MCP Server
-resource "aws_bedrockagentcore_gateway_target" "lambda_mcp" {
-  gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
-  name               = "lambda-mcp-${random_id.suffix.hex}"
-  description        = "Lambda-based MCP server"
-
-  target_configuration {
-    mcp {
-      mcp_server {
-        endpoint = module.lambda_mcp.function_url
-      }
-    }
-  }
-
-  depends_on = [module.lambda_mcp]
-}
+# # Gateway Target: Lambda MCP Server
+# resource "aws_bedrockagentcore_gateway_target" "lambda_mcp" {
+#   gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
+#   name               = "lambda-mcp-${random_id.suffix.hex}"
+#   description        = "Lambda-based MCP server"
+#
+#   target_configuration {
+#     mcp {
+#       mcp_server {
+#         endpoint = module.lambda_mcp.function_url
+#       }
+#     }
+#   }
+#
+#   depends_on = [
+#     module.lambda_mcp,
+#     module.lambda_mcp.function_url
+#   ]
+# }

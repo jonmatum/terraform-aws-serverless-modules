@@ -53,11 +53,10 @@ docker buildx build \
 # Build and push Action Lambda
 echo ""
 echo "Building and pushing Action Lambda..."
-ECR_ACTIONS=$(terraform output -raw ecr_actions_repository_url)
 docker buildx build \
   --platform linux/amd64 \
   --provenance=false \
-  --output type=image,name=${ECR_ACTIONS}:${IMAGE_TAG},push=true \
+  --output type=image,name=${ECR_LAMBDA}:actions,push=true \
   "$SCRIPT_DIR/action-lambda"
 
 # Apply full infrastructure
