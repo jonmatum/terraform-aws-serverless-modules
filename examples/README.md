@@ -79,6 +79,22 @@ Full CRUD app with REST API, React frontend, and DynamoDB. Features:
 
 ### 5. Advanced Patterns
 
+#### [sqs-queue](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sqs-queue)
+Lambda processing SQS messages with DLQ. Features:
+- Standard and FIFO queues
+- Dead letter queue handling
+- Lambda event source mapping
+- Long polling
+- Automatic retries
+
+#### [sns-fanout](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sns-fanout)
+SNS topic with message filtering to multiple SQS queues. Features:
+- Fan-out pattern
+- Message filtering by attributes
+- Multiple queue subscriptions
+- Email notifications
+- Priority-based routing
+
 #### [agentcore-full](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/agentcore-full)
 Comprehensive AWS Bedrock AgentCore example with all capabilities. Features:
 - Multiple MCP servers (ECS + Lambda)
@@ -191,6 +207,18 @@ Examples: [crud-api-rest](https://github.com/jonmatum/terraform-aws-serverless-m
 Internet → API Gateway → VPC Link → ALB → Multiple ECS Services
 ```
 Example: [api-gateway-multi-service](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/api-gateway-multi-service)
+
+### Event-Driven Processing
+```
+SQS Queue → Lambda Processor → DLQ
+```
+Example: [sqs-queue](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sqs-queue)
+
+### Fan-out Pattern
+```
+SNS Topic → Multiple SQS Queues (with filtering)
+```
+Example: [sns-fanout](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/examples/sns-fanout)
 
 ### AgentCore with MCP Servers
 ```
