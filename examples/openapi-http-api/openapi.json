@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://openapi-http-api-nlb-972692275257b6a5.elb.us-east-1.amazonaws.com"
+      "url": "http://openapi-http-api-nlb-7e437c0f4159396c.elb.us-east-1.amazonaws.com"
     }
   ],
   "paths": {

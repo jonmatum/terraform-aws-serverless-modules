@@ -19,9 +19,9 @@ cd "$TERRAFORM_DIR"
 echo "Initializing Terraform..."
 terraform init
 
-# Apply infrastructure
-echo "Applying infrastructure..."
-terraform apply -auto-approve
+# Create ECR repositories first
+echo "Creating ECR repositories..."
+terraform apply -target=module.ecr_ecs -target=module.ecr_lambda -auto-approve
 
 # Get ECR repository URLs
 ECR_ECS=$(terraform output -raw ecr_ecs_repository_url)
@@ -59,6 +59,11 @@ docker buildx build \
   --provenance=false \
   --output type=image,name=${ECR_ACTIONS}:${IMAGE_TAG},push=true \
   "$SCRIPT_DIR/action-lambda"
+
+# Apply full infrastructure
+echo ""
+echo "Applying full infrastructure..."
+terraform apply -auto-approve
 
 # Force ECS update if service exists
 CLUSTER=$(terraform output -raw ecs_cluster_name)

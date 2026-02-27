@@ -37,7 +37,7 @@ def handler(event, context):
                 'memory_limit': context.memory_limit_in_mb,
                 'environment': environment,
                 'log_level': log_level,
-                'request_id': context.request_id
+                'request_id': context.aws_request_id
             })
         }
 

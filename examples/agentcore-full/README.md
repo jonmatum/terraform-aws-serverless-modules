@@ -106,11 +106,18 @@ Additional Components (accessed directly):
 
 ## Prerequisites
 
+**Required:**
 - AWS Provider >= 6.18.0
 - Terraform >= 1.0
 - Docker
 - AWS CLI configured
-- ACM certificate for HTTPS (required for Gateway Targets)
+- **OpenSearch Serverless subscription** (Knowledge Base requires this service)
+- **Bedrock model access** (Claude 3 Sonnet, Titan Embeddings)
+
+**Optional:**
+- ACM certificate for HTTPS (required for ECS Gateway Target only)
+
+**Note:** This example requires OpenSearch Serverless which may not be available in all AWS accounts. If you encounter "SubscriptionRequiredException", this service is not enabled for your account.
 
 ## Quick Start
 

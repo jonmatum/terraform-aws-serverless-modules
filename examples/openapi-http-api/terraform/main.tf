@@ -53,7 +53,7 @@ with open('openapi.json', 'w') as f:
 }
 
 data "local_file" "openapi_spec" {
-  filename   = "${path.module}/openapi.json"
+  filename   = "${path.module}/../openapi.json"
   depends_on = [null_resource.generate_openapi]
 }
 
