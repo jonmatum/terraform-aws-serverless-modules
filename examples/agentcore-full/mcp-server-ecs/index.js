@@ -1,148 +1,162 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import express from 'express';
-import { createServer } from 'http';
-
-const PORT = process.env.PORT || 3000;
-
-// MCP Server
-const mcpServer = new Server(
-  {
-    name: 'ecs-mcp-server',
-    version: '1.0.0',
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  }
-);
-
-// Register tools
-mcpServer.setRequestHandler('tools/list', async () => ({
-  tools: [
-    {
-      name: 'echo',
-      description: 'Echo back a message',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-            description: 'Message to echo',
-          },
-        },
-        required: ['message'],
-      },
-    },
-    {
-      name: 'get_system_info',
-      description: 'Get ECS container system information',
-      inputSchema: {
-        type: 'object',
-        properties: {},
-      },
-    },
-    {
-      name: 'calculate',
-      description: 'Perform basic calculations',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          operation: {
-            type: 'string',
-            enum: ['add', 'subtract', 'multiply', 'divide'],
-            description: 'Mathematical operation',
-          },
-          a: { type: 'number', description: 'First number' },
-          b: { type: 'number', description: 'Second number' },
-        },
-        required: ['operation', 'a', 'b'],
-      },
-    },
-  ],
-}));
-
-mcpServer.setRequestHandler('tools/call', async (request) => {
-  const { name, arguments: args } = request.params;
-
-  switch (name) {
-    case 'echo':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Echo: ${args.message}`,
-          },
-        ],
-      };
-
-    case 'get_system_info':
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              platform: process.platform,
-              nodeVersion: process.version,
-              memory: process.memoryUsage(),
-              uptime: process.uptime(),
-              env: process.env.NODE_ENV,
-            }, null, 2),
-          },
-        ],
-      };
-
-    case 'calculate':
-      let result;
-      switch (args.operation) {
-        case 'add': result = args.a + args.b; break;
-        case 'subtract': result = args.a - args.b; break;
-        case 'multiply': result = args.a * args.b; break;
-        case 'divide': result = args.b !== 0 ? args.a / args.b : 'Error: Division by zero'; break;
-      }
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Result: ${result}`,
-          },
-        ],
-      };
-
-    default:
-      throw new Error(`Unknown tool: ${name}`);
-  }
-});
-
-// HTTP Server for health checks and MCP over HTTP
+const express = require('express');
 const app = express();
+const port = process.env.PORT || 8080;
+
 app.use(express.json());
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
-});
-
-app.post('/mcp', async (req, res) => {
+// MCP protocol handler
+app.post('/', async (req, res) => {
   try {
-    const response = await mcpServer.handleRequest(req.body);
-    res.json(response);
+    const { jsonrpc = "2.0", method, params = {}, id } = req.body;
+
+    if (method === 'initialize') {
+      return res.json({
+        jsonrpc,
+        id,
+        result: {
+          protocolVersion: "2024-11-05",
+          capabilities: {
+            tools: {}
+          },
+          serverInfo: {
+            name: "ecs-mcp-server",
+            version: "1.0.0"
+          }
+        }
+      });
+    }
+
+    if (method === 'tools/list') {
+      return res.json({
+        jsonrpc,
+        id,
+        result: {
+          tools: [
+            {
+              name: "uppercase",
+              description: "Convert text to uppercase",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  text: {
+                    type: "string",
+                    description: "Text to convert"
+                  }
+                },
+                required: ["text"]
+              }
+            },
+            {
+              name: "word_count",
+              description: "Count words in text",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  text: {
+                    type: "string",
+                    description: "Text to count words in"
+                  }
+                },
+                required: ["text"]
+              }
+            },
+            {
+              name: "get_server_info",
+              description: "Get ECS server information",
+              inputSchema: {
+                type: "object",
+                properties: {}
+              }
+            }
+          ]
+        }
+      });
+    }
+
+    if (method === 'tools/call') {
+      const { name, arguments: args } = params;
+
+      if (name === 'uppercase') {
+        return res.json({
+          jsonrpc,
+          id,
+          result: {
+            content: [{
+              type: "text",
+              text: (args.text || "").toUpperCase()
+            }]
+          }
+        });
+      }
+
+      if (name === 'word_count') {
+        const count = (args.text || "").split(/\s+/).filter(w => w.length > 0).length;
+        return res.json({
+          jsonrpc,
+          id,
+          result: {
+            content: [{
+              type: "text",
+              text: `Word count: ${count}`
+            }]
+          }
+        });
+      }
+
+      if (name === 'get_server_info') {
+        return res.json({
+          jsonrpc,
+          id,
+          result: {
+            content: [{
+              type: "text",
+              text: JSON.stringify({
+                platform: "ECS Fargate",
+                environment: process.env.ENVIRONMENT || "dev",
+                nodeVersion: process.version
+              }, null, 2)
+            }]
+          }
+        });
+      }
+
+      return res.json({
+        jsonrpc,
+        id,
+        error: {
+          code: -32601,
+          message: `Unknown tool: ${name}`
+        }
+      });
+    }
+
+    return res.json({
+      jsonrpc,
+      id,
+      error: {
+        code: -32601,
+        message: `Method not found: ${method}`
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      jsonrpc: "2.0",
+      id: req.body.id,
+      error: {
+        code: -32603,
+        message: "Internal error",
+        data: error.message
+      }
+    });
   }
 });
 
-const httpServer = createServer(app);
-
-httpServer.listen(PORT, () => {
-  console.log(`MCP Server listening on port ${PORT}`);
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
 });
 
-// Handle shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  httpServer.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
+app.listen(port, () => {
+  console.log(`MCP server listening on port ${port}`);
 });
