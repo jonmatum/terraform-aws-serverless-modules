@@ -4,34 +4,65 @@
 
 SNS topic publishing to multiple SQS queues with message filtering for event-driven architecture.
 
-## Architecture Diagram
+## High-Level Architecture
 
+```mermaid
+graph TB
+    subgraph "Event Publishers"
+        App[Application]
+    end
+
+    subgraph "AWS Cloud"
+        subgraph "SNS Topics"
+            EventsTopic[Events Topic<br/>Standard]
+            AlertsTopic[Alerts Topic<br/>Email]
+        end
+
+        subgraph "SQS Queues"
+            AllQ[All Events Queue<br/>No Filter]
+            HighQ[High Priority Queue<br/>priority filter]
+            OrdersQ[Orders Queue<br/>event_type filter]
+        end
+
+        subgraph "Dead Letter Queues"
+            HighDLQ[High Priority DLQ]
+            OrdersDLQ[Orders DLQ]
+        end
+
+        subgraph "Subscribers"
+            Email[Email Subscribers]
+        end
+    end
+
+    App --> EventsTopic
+    App --> AlertsTopic
+    EventsTopic -->|All messages| AllQ
+    EventsTopic -->|priority: high/urgent| HighQ
+    EventsTopic -->|event_type: order_*| OrdersQ
+    AlertsTopic --> Email
+    HighQ -.->|After 3 retries| HighDLQ
+    OrdersQ -.->|After 3 retries| OrdersDLQ
 ```
-                    ┌─────────────┐
-                    │  SNS Topic  │
-                    │   (Events)  │
-                    └──────┬──────┘
-                           │
-           ┌───────────────┼───────────────┐
-           │               │               │
-      ┌────▼────┐     ┌────▼────┐    ┌────▼────┐
-      │   All   │     │  High   │    │ Orders  │
-      │ Events  │     │Priority │    │  Queue  │
-      │  Queue  │     │  Queue  │    └─────────┘
-      └─────────┘     └─────────┘
-      (no filter)     (priority    (event_type
-                       filter)       filter)
 
+## Message Flow with Filtering
 
-                    ┌─────────────┐
-                    │  SNS Topic  │
-                    │   (Alerts)  │
-                    └──────┬──────┘
-                           │
-                      ┌────▼────┐
-                      │  Email  │
-                      │Subscribers│
-                      └─────────┘
+```mermaid
+sequenceDiagram
+    participant App as Application
+    participant SNS as SNS Topic
+    participant AllQ as All Events Queue
+    participant HighQ as High Priority Queue
+    participant OrdersQ as Orders Queue
+
+    App->>SNS: Publish Event<br/>{priority: "high", event_type: "order_created"}
+    
+    Note over SNS: Evaluate filters
+    
+    SNS->>AllQ: Deliver (no filter)
+    SNS->>HighQ: Deliver (priority matches)
+    SNS->>OrdersQ: Deliver (event_type matches)
+    
+    Note over AllQ,OrdersQ: Independent processing<br/>by consumers
 ```
 
 ## Components
@@ -105,6 +136,43 @@ SNS topic publishing to multiple SQS queues with message filtering for event-dri
 }
 ```
 → Delivered to: All Events Queue + Orders Queue
+
+## Terraform Resources
+
+```mermaid
+graph TB
+    subgraph "SNS Module"
+        EventsTopic[Events Topic]
+        AlertsTopic[Alerts Topic]
+        Sub1[Subscription: All Events]
+        Sub2[Subscription: High Priority]
+        Sub3[Subscription: Orders]
+        Sub4[Subscription: Email]
+    end
+
+    subgraph "SQS Module"
+        AllQ[All Events Queue]
+        HighQ[High Priority Queue<br/>+ DLQ]
+        OrdersQ[Orders Queue<br/>+ DLQ]
+    end
+
+    subgraph "IAM"
+        Policy1[Queue Policy: All Events]
+        Policy2[Queue Policy: High Priority]
+        Policy3[Queue Policy: Orders]
+    end
+
+    EventsTopic --> Sub1
+    EventsTopic --> Sub2
+    EventsTopic --> Sub3
+    AlertsTopic --> Sub4
+    Sub1 --> AllQ
+    Sub2 --> HighQ
+    Sub3 --> OrdersQ
+    AllQ --> Policy1
+    HighQ --> Policy2
+    OrdersQ --> Policy3
+```
 
 ## Message Filtering
 

@@ -13,30 +13,38 @@ echo "Region: $AWS_REGION"
 echo "Image Tag: $IMAGE_TAG"
 echo ""
 
+# Change to Terraform directory
 cd "$TERRAFORM_DIR"
 
-echo "Initializing Terraform..."
+# Step 1: Initialize Terraform
+echo "Step 1: Initializing Terraform..."
 terraform init
 
-echo "Creating ECR repository..."
+# Step 2: Create ECR repository
+echo ""
+echo "Step 2: Creating ECR repository..."
 terraform apply -target=module.ecr -auto-approve
 
+# Get ECR repository URL
 ECR_REPO=$(terraform output -raw ecr_repository_url)
 
+# Step 3: Login to ECR
 echo ""
-echo "Logging into ECR..."
+echo "Step 3: Logging into ECR..."
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
 
+# Step 4: Build and push Docker image
 echo ""
-echo "Building and pushing Docker image..."
+echo "Step 4: Building and pushing Docker image..."
 docker buildx build \
   --platform linux/amd64 \
   --provenance=false \
   --output type=image,name=${ECR_REPO}:${IMAGE_TAG},push=true \
   "$PROCESSOR_DIR"
 
+# Step 5: Deploy infrastructure
 echo ""
-echo "Deploying infrastructure..."
+echo "Step 5: Deploying infrastructure..."
 terraform apply -auto-approve
 
 echo ""

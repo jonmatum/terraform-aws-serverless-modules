@@ -10,13 +10,16 @@ echo "=== SNS Fan-out Example Deployment ==="
 echo "Region: $AWS_REGION"
 echo ""
 
+# Change to Terraform directory
 cd "$TERRAFORM_DIR"
 
-echo "Initializing Terraform..."
+# Step 1: Initialize Terraform
+echo "Step 1: Initializing Terraform..."
 terraform init
 
+# Step 2: Deploy infrastructure
 echo ""
-echo "Deploying infrastructure..."
+echo "Step 2: Deploying infrastructure..."
 terraform apply -auto-approve
 
 echo ""
