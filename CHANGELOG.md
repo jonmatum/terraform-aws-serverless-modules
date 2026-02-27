@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v3.1.0...v3.1.1) (2026-02-27)
+
+
+### Documentation
+
+* add missing examples to README table ([3887168](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/3887168))
+
 ## [3.1.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v3.0.0...v3.1.0) (2026-02-27)
 
 
