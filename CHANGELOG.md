@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.1.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v3.0.0...v3.1.0) (2026-02-27)
+
+
+### Features
+
+* add SQS and SNS examples ([6698b7f](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/6698b7f663021eca0315e36e4950df81be1d2301))
+* add SQS and SNS modules ([8a6393c](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/8a6393c7b4c3aa0bcd5326375f5a2aa2d3c2df59))
+* **agentcore-full:** add SQS queue integration for async processing ([863f042](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/863f042e42053dc53ef4590e78251f5e1d6992ff))
+* **agentcore:** add comprehensive AgentCore example with all capabilities ([d094c79](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/d094c798758897aabf70b1b0a5e1bf8f28200406))
+* **agentcore:** implement proper MCP JSON-RPC protocol ([c13d225](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/c13d2258a80ce064f11bde66331612cf8e1a40b3))
+* **agentcore:** make all advanced features optional ([9b73688](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/9b7368831bb5b7f37c399359001bc5fcaf4b6e2d))
+* **lambda:** add production-ready Lambda module with monitoring and reliability features ([9676f89](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/9676f89d8b0f4949370fa6e1f3b14a9f907a8e2a))
+* **sqs-queue:** add comprehensive example with FIFO queue and DLQ ([522b50c](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/522b50c8120f07206417aa56442c5e7ca0a48706))
+
+
+### Bug Fixes
+
+* **agentcore-full:** configure Lambda MCP for gateway compatibility ([04816bf](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/04816bf088547cf06d8199607852c24817b4e444))
+* **agentcore:** add random suffix to gateway target name to avoid conflicts ([bf186e5](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/bf186e5944503e1394206519b4c948d4800b59ad))
+* **agentcore:** disable gateway targets and fix actions image tag ([6c8a7fd](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/6c8a7fd9ff37ccfb8834c3d664c654cabc7acd21))
+* **agentcore:** improve deploy script and document OpenSearch requirement ([2662fc4](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/2662fc498548cb804b6c95c1f481080878522e10))
+* **agentcore:** update deploy script to match standard format ([dd28708](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/dd287084959389592605ee7b12556e02fffbe581))
+* **api-gateway-v1:** remove unused alb_listener_arn variable ([09a718e](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/09a718ef4332d65c0fdae0aac69e6e809b10b70b))
+* standardize deploy scripts and convert diagrams to mermaid ([db3c411](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/db3c4114847d00d1c7359ae9e45bfed290c389bb))
+
 ## [3.0.0](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v2.1.0...v3.0.0) (2026-02-26)
 
 
