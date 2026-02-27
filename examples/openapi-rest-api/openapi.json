@@ -5,7 +5,7 @@
     "description": "API for managing products with OpenAPI schema",
     "version": "1.0.0"
   },
-  "host": "openapi-rest-api-nlb-6795c1f66e2fbc53.elb.us-east-1.amazonaws.com",
+  "host": "openapi-rest-api-nlb-b1c19742932ed7d5.elb.us-east-1.amazonaws.com",
   "basePath": "/",
   "schemes": [
     "http"
