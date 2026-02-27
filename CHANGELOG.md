@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.2](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v3.1.1...v3.1.2) (2026-02-27)
+
+
+### Bug Fixes
+
+* **lambda-function:** remove duplicate ECR login from deploy script ([2c66d57](https://github.com/jonmatum/terraform-aws-serverless-modules/commit/2c66d578ca5a9cc8444c44803c26f67d71b942dc))
+
 ## [3.1.1](https://github.com/jonmatum/terraform-aws-serverless-modules/compare/v3.1.0...v3.1.1) (2026-02-27)
 
 
