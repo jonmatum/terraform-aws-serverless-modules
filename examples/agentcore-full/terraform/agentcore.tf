@@ -4,7 +4,7 @@ resource "random_id" "suffix" {
 
 # AgentCore Gateway with Guardrails
 resource "aws_bedrockagentcore_gateway" "main" {
-  name        = "${var.project_name}-gateway"
+  name        = "${var.project_name}-gateway-v2"
   description = "Comprehensive AgentCore Gateway with multiple targets"
   role_arn    = aws_iam_role.gateway.arn
 
@@ -23,9 +23,13 @@ resource "aws_bedrockagentcore_gateway" "main" {
 }
 
 # Gateway Target: Lambda MCP Server
+resource "random_id" "target_suffix" {
+  byte_length = 4
+}
+
 resource "aws_bedrockagentcore_gateway_target" "lambda_mcp" {
   gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
-  name               = "lambda-mcp-${random_id.suffix.hex}"
+  name               = "lambda-mcp-${random_id.target_suffix.hex}"
   description        = "Lambda-based MCP server"
 
   target_configuration {

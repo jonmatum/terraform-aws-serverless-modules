@@ -22,16 +22,35 @@ resource "aws_iam_role_policy" "gateway" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      Resource = "arn:aws:logs:${var.aws_region}:*:log-group:/aws/bedrock-agentcore/*"
-    }]
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:${var.aws_region}:*:log-group:/aws/bedrock-agentcore/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunctionUrl"
+        ]
+        Resource = module.lambda_mcp.function_arn
+      }
+    ]
   })
+}
+
+# Allow gateway role to invoke Lambda function URL
+resource "aws_lambda_permission" "gateway_invoke" {
+  statement_id           = "AllowBedrockAgentCoreGateway"
+  action                 = "lambda:InvokeFunctionUrl"
+  function_name          = module.lambda_mcp.function_name
+  principal              = "bedrock-agentcore.amazonaws.com"
+  source_arn             = aws_bedrockagentcore_gateway.main.gateway_arn
+  function_url_auth_type = "AWS_IAM"
 }
 
 # Knowledge Base IAM Role
