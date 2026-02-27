@@ -121,43 +121,71 @@ Additional Components (accessed directly):
 
 ## Quick Start
 
+**Basic deployment (works out-of-the-box):**
+
 ```bash
-# 1. Create ACM certificate
-aws acm request-certificate \
-  --domain-name your-domain.com \
-  --validation-method DNS
+cd examples/agentcore-full
+./deploy.sh
+```
 
-# 2. Deploy infrastructure
+This deploys:
+- 2 MCP servers (ECS Fargate + Lambda)
+- AgentCore Gateway
+- VPC, ALB, ECR, CloudWatch
+
+**Enable advanced features:**
+
+```bash
 cd terraform
-terraform init
-terraform apply -var="certificate_arn=arn:aws:acm:..."
 
-# 3. Upload documents to Knowledge Base
-aws s3 cp docs/ s3://$(terraform output -raw kb_bucket_name)/docs/ --recursive
+# Enable Knowledge Base (requires OpenSearch Serverless subscription)
+terraform apply -var="enable_knowledge_base=true"
 
-# 4. Sync Knowledge Base
-aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id $(terraform output -raw knowledge_base_id) \
-  --data-source-id $(terraform output -raw data_source_id)
+# Enable Agent with actions
+terraform apply -var="enable_agent=true"
+
+# Enable Guardrails
+terraform apply -var="enable_guardrails=true"
+
+# Enable all
+terraform apply \
+  -var="enable_knowledge_base=true" \
+  -var="enable_agent=true" \
+  -var="enable_guardrails=true"
 ```
 
 ## Testing
 
+**Test Lambda MCP server:**
+
 ```bash
-# Get Gateway ID
+cd terraform
+LAMBDA_URL=$(terraform output -raw lambda_mcp_url)
+
+# Invoke with IAM auth
+aws lambda invoke-url \
+  --function-name agentcore-full-mcp-lambda \
+  --payload '{"method":"tools/list"}' \
+  response.json
+```
+
+**Test ECS MCP server:**
+
+```bash
+ALB_DNS=$(terraform output -raw alb_dns_name)
+curl http://$ALB_DNS/health
+```
+
+**Test Gateway (if enabled):**
+
+```bash
 GATEWAY_ID=$(terraform output -raw gateway_id)
 
-# Test MCP server via Gateway
 aws bedrock-agentcore-runtime invoke-gateway \
   --gateway-identifier $GATEWAY_ID \
   --request-body '{"method":"tools/list"}' \
   --region us-east-1
-
-# Test Knowledge Base
-aws bedrock-agent-runtime retrieve \
-  --knowledge-base-id $(terraform output -raw knowledge_base_id) \
-  --retrieval-query '{"text":"What is our return policy?"}'
-
+```
 # Test Agent
 aws bedrock-agent-runtime invoke-agent \
   --agent-id $(terraform output -raw agent_id) \
