@@ -36,6 +36,7 @@ resource "aws_iam_role_policy" "gateway" {
 
 # Knowledge Base IAM Role
 resource "aws_iam_role" "kb" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "${var.project_name}-kb-role"
 
   assume_role_policy = jsonencode({
@@ -61,8 +62,9 @@ resource "aws_iam_role" "kb" {
 }
 
 resource "aws_iam_role_policy" "kb" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "kb-policy"
-  role = aws_iam_role.kb.id
+  role = aws_iam_role.kb[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -81,8 +83,8 @@ resource "aws_iam_role_policy" "kb" {
           "s3:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.kb_docs.arn,
-          "${aws_s3_bucket.kb_docs.arn}/*"
+          aws_s3_bucket.kb_docs[0].arn,
+          "${aws_s3_bucket.kb_docs[0].arn}/*"
         ]
       },
       {
@@ -90,7 +92,7 @@ resource "aws_iam_role_policy" "kb" {
         Action = [
           "aoss:APIAccessAll"
         ]
-        Resource = aws_opensearchserverless_collection.kb.arn
+        Resource = aws_opensearchserverless_collection.kb[0].arn
       }
     ]
   })
@@ -98,6 +100,7 @@ resource "aws_iam_role_policy" "kb" {
 
 # Agent IAM Role
 resource "aws_iam_role" "agent" {
+  count = var.enable_agent ? 1 : 0
   name = "${var.project_name}-agent-role"
 
   assume_role_policy = jsonencode({
@@ -123,8 +126,9 @@ resource "aws_iam_role" "agent" {
 }
 
 resource "aws_iam_role_policy" "agent" {
+  count = var.enable_agent ? 1 : 0
   name = "agent-policy"
-  role = aws_iam_role.agent.id
+  role = aws_iam_role.agent[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -141,7 +145,7 @@ resource "aws_iam_role_policy" "agent" {
         Action = [
           "bedrock:Retrieve"
         ]
-        Resource = aws_bedrockagent_knowledge_base.docs.arn
+        Resource = aws_bedrockagent_knowledge_base.docs[0].arn
       }
     ]
   })
@@ -236,11 +240,12 @@ resource "aws_iam_role_policy_attachment" "lambda_actions" {
 
 # Lambda permission for Agent to invoke actions
 resource "aws_lambda_permission" "agent_invoke" {
+  count = var.enable_agent ? 1 : 0
   statement_id  = "AllowBedrockAgentInvoke"
   action        = "lambda:InvokeFunction"
   function_name = module.lambda_actions.function_name
   principal     = "bedrock.amazonaws.com"
-  source_arn    = aws_bedrockagent_agent.assistant.agent_arn
+  source_arn    = aws_bedrockagent_agent.assistant[0].agent_arn
 }
 
 # Security Groups
@@ -276,3 +281,4 @@ resource "aws_cloudwatch_log_group" "ecs_mcp" {
   retention_in_days = 30
   tags              = var.tags
 }
+

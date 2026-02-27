@@ -1,7 +1,8 @@
 # Bedrock Agent
 resource "aws_bedrockagent_agent" "assistant" {
+  count = var.enable_agent ? 1 : 0
   agent_name              = "${var.project_name}-assistant"
-  agent_resource_role_arn = aws_iam_role.agent.arn
+  agent_resource_role_arn = aws_iam_role.agent[0].arn
   foundation_model        = var.agent_model
   instruction             = var.agent_instruction
 
@@ -10,14 +11,16 @@ resource "aws_bedrockagent_agent" "assistant" {
 
 # Agent Alias
 resource "aws_bedrockagent_agent_alias" "live" {
-  agent_id         = aws_bedrockagent_agent.assistant.agent_id
+  count = var.enable_agent ? 1 : 0
+  agent_id         = aws_bedrockagent_agent.assistant[0].agent_id
   agent_alias_name = "live"
   description      = "Live production alias"
 }
 
 # Action Group for API integrations
 resource "aws_bedrockagent_agent_action_group" "api_actions" {
-  agent_id          = aws_bedrockagent_agent.assistant.agent_id
+  count = var.enable_agent ? 1 : 0
+  agent_id          = aws_bedrockagent_agent.assistant[0].agent_id
   agent_version     = "DRAFT"
   action_group_name = "api-actions"
 
@@ -110,9 +113,12 @@ resource "aws_bedrockagent_agent_action_group" "api_actions" {
 
 # Associate Knowledge Base with Agent
 resource "aws_bedrockagent_agent_knowledge_base_association" "docs" {
-  agent_id             = aws_bedrockagent_agent.assistant.agent_id
+  count = var.enable_agent ? 1 : 0
+  agent_id             = aws_bedrockagent_agent.assistant[0].agent_id
   agent_version        = "DRAFT"
-  knowledge_base_id    = aws_bedrockagent_knowledge_base.docs.id
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.docs[0].id
   knowledge_base_state = "ENABLED"
   description          = "Company documentation knowledge base"
 }
+
+

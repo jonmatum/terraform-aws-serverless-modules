@@ -75,29 +75,31 @@ if aws ecs describe-services --region ${AWS_REGION} --cluster ${CLUSTER} --servi
   aws ecs update-service --region ${AWS_REGION} --cluster ${CLUSTER} --service ${SERVICE} --force-new-deployment --no-cli-pager > /dev/null
 fi
 
-# Sync Knowledge Base documents
-echo ""
-echo "Syncing Knowledge Base documents..."
-KB_BUCKET=$(terraform output -raw kb_bucket_name)
-aws s3 sync "$SCRIPT_DIR/docs" s3://${KB_BUCKET}/ --delete
+# Sync Knowledge Base documents (if enabled)
+if terraform output kb_bucket_name 2>/dev/null | grep -v "null" > /dev/null; then
+  echo ""
+  echo "Syncing Knowledge Base documents..."
+  KB_BUCKET=$(terraform output -raw kb_bucket_name)
+  aws s3 sync "$SCRIPT_DIR/docs" s3://${KB_BUCKET}/ --delete
 
-# Start Knowledge Base ingestion
-KB_ID=$(terraform output -raw knowledge_base_id)
-DS_ID=$(terraform output -raw data_source_id)
+  # Start Knowledge Base ingestion
+  KB_ID=$(terraform output -raw knowledge_base_id)
+  DS_ID=$(terraform output -raw data_source_id)
 
-echo "Starting Knowledge Base ingestion..."
-aws bedrock-agent start-ingestion-job \
-  --knowledge-base-id ${KB_ID} \
-  --data-source-id ${DS_ID} \
-  --region ${AWS_REGION} \
-  --no-cli-pager > /dev/null
+  echo "Starting Knowledge Base ingestion..."
+  aws bedrock-agent start-ingestion-job \
+    --knowledge-base-id ${KB_ID} \
+    --data-source-id ${DS_ID} \
+    --region ${AWS_REGION} \
+    --no-cli-pager > /dev/null
+fi
 
 echo ""
 echo "=== Deployment Complete ==="
 echo ""
 echo "Gateway ID: $(terraform output -raw gateway_id)"
-echo "Agent ID: $(terraform output -raw agent_id)"
-echo "Knowledge Base ID: ${KB_ID}"
+echo "Lambda MCP URL: $(terraform output -raw lambda_mcp_url)"
+echo "ALB DNS: $(terraform output -raw alb_dns_name)"
 echo ""
-echo "Test commands:"
-echo "  aws bedrock-agent-runtime invoke-agent --agent-id $(terraform output -raw agent_id) --agent-alias-id $(terraform output -raw agent_alias_id) --session-id test-session --input-text 'What is your return policy?'"
+echo "To enable Knowledge Base and Agent:"
+echo "  terraform apply -var='enable_knowledge_base=true' -var='enable_agent=true'"

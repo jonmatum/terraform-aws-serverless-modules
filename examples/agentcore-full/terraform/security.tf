@@ -75,7 +75,8 @@ resource "aws_iam_role_policy_attachment" "lambda_actions_xray" {
 
 # S3 Bucket Lifecycle for cost optimization
 resource "aws_s3_bucket_lifecycle_configuration" "kb_docs" {
-  bucket = aws_s3_bucket.kb_docs.id
+  count = var.enable_knowledge_base ? 1 : 0
+  bucket = aws_s3_bucket.kb_docs[0].id
 
   rule {
     id     = "archive-old-versions"
@@ -96,3 +97,5 @@ resource "aws_s3_bucket_lifecycle_configuration" "kb_docs" {
     }
   }
 }
+
+

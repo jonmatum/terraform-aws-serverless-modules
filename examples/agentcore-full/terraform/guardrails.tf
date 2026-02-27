@@ -1,5 +1,6 @@
 # Guardrails for content filtering
 resource "aws_bedrock_guardrail" "content_filter" {
+  count = var.enable_guardrails ? 1 : 0
   name                      = "${var.project_name}-guardrail"
   blocked_input_messaging   = "Sorry, I cannot process that request due to content policy."
   blocked_outputs_messaging = "Sorry, I cannot provide that response due to content policy."
@@ -114,6 +115,8 @@ resource "aws_bedrock_guardrail" "content_filter" {
 
 # Create guardrail version
 resource "aws_bedrock_guardrail_version" "v1" {
-  guardrail_arn = aws_bedrock_guardrail.content_filter.guardrail_arn
+  count = var.enable_guardrails ? 1 : 0
+  guardrail_arn = aws_bedrock_guardrail.content_filter[0].guardrail_arn
   description   = "Version 1"
 }
+

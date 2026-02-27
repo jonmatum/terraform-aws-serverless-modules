@@ -1,19 +1,22 @@
 # S3 bucket for Knowledge Base documents
 resource "aws_s3_bucket" "kb_docs" {
+  count = var.enable_knowledge_base ? 1 : 0
   bucket = "${var.project_name}-kb-docs-${local.account_id}"
 
   tags = var.tags
 }
 
 resource "aws_s3_bucket_versioning" "kb_docs" {
-  bucket = aws_s3_bucket.kb_docs.id
+  count = var.enable_knowledge_base ? 1 : 0
+  bucket = aws_s3_bucket.kb_docs[0].id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "kb_docs" {
-  bucket = aws_s3_bucket.kb_docs.id
+  count = var.enable_knowledge_base ? 1 : 0
+  bucket = aws_s3_bucket.kb_docs[0].id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -24,6 +27,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "kb_docs" {
 
 # OpenSearch Serverless Collection for Knowledge Base
 resource "aws_opensearchserverless_security_policy" "kb_encryption" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "${var.project_name}-kb-encryption"
   type = "encryption"
   policy = jsonencode({
@@ -36,6 +40,7 @@ resource "aws_opensearchserverless_security_policy" "kb_encryption" {
 }
 
 resource "aws_opensearchserverless_security_policy" "kb_network" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "${var.project_name}-kb-network"
   type = "network"
   policy = jsonencode([{
@@ -48,6 +53,7 @@ resource "aws_opensearchserverless_security_policy" "kb_network" {
 }
 
 resource "aws_opensearchserverless_collection" "kb" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "${var.project_name}-kb"
   type = "VECTORSEARCH"
 
@@ -60,6 +66,7 @@ resource "aws_opensearchserverless_collection" "kb" {
 }
 
 resource "aws_opensearchserverless_access_policy" "kb" {
+  count = var.enable_knowledge_base ? 1 : 0
   name = "${var.project_name}-kb-access"
   type = "data"
   policy = jsonencode([{
@@ -83,14 +90,15 @@ resource "aws_opensearchserverless_access_policy" "kb" {
         "aoss:DeleteIndex"
       ]
     }]
-    Principal = [aws_iam_role.kb.arn]
+    Principal = [aws_iam_role.kb[0].arn]
   }])
 }
 
 # Knowledge Base
 resource "aws_bedrockagent_knowledge_base" "docs" {
+  count = var.enable_knowledge_base ? 1 : 0
   name     = "${var.project_name}-kb"
-  role_arn = aws_iam_role.kb.arn
+  role_arn = aws_iam_role.kb[0].arn
 
   knowledge_base_configuration {
     type = "VECTOR"
@@ -102,7 +110,7 @@ resource "aws_bedrockagent_knowledge_base" "docs" {
   storage_configuration {
     type = "OPENSEARCH_SERVERLESS"
     opensearch_serverless_configuration {
-      collection_arn    = aws_opensearchserverless_collection.kb.arn
+      collection_arn    = aws_opensearchserverless_collection.kb[0].arn
       vector_index_name = "bedrock-knowledge-base-index"
       field_mapping {
         vector_field   = "embedding"
@@ -119,13 +127,16 @@ resource "aws_bedrockagent_knowledge_base" "docs" {
 
 # Data Source for Knowledge Base
 resource "aws_bedrockagent_data_source" "s3" {
-  knowledge_base_id = aws_bedrockagent_knowledge_base.docs.id
+  count = var.enable_knowledge_base ? 1 : 0
+  knowledge_base_id = aws_bedrockagent_knowledge_base.docs[0].id
   name              = "s3-documents"
 
   data_source_configuration {
     type = "S3"
     s3_configuration {
-      bucket_arn = aws_s3_bucket.kb_docs.arn
+      bucket_arn = aws_s3_bucket.kb_docs[0].arn
     }
   }
 }
+
+

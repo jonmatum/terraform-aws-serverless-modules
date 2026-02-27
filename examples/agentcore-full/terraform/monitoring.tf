@@ -88,6 +88,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_actions_errors" {
 
 # OpenSearch Storage Alarm
 resource "aws_cloudwatch_metric_alarm" "opensearch_storage" {
+  count = var.enable_knowledge_base ? 1 : 0
   alarm_name          = "${var.project_name}-opensearch-storage"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -100,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "opensearch_storage" {
   treat_missing_data  = "notBreaching"
 
   dimensions = {
-    CollectionName = aws_opensearchserverless_collection.kb.name
+    CollectionName = aws_opensearchserverless_collection.kb[0].name
   }
 
   alarm_actions = local.alarm_actions
@@ -122,3 +123,4 @@ resource "aws_sns_topic_subscription" "alarms_email" {
   protocol  = "email"
   endpoint  = var.alarm_email
 }
+

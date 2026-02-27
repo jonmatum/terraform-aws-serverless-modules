@@ -52,6 +52,24 @@ variable "enable_vpc_flow_logs" {
   default     = false
 }
 
+variable "enable_knowledge_base" {
+  description = "Enable Knowledge Base with OpenSearch Serverless (requires service subscription)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_agent" {
+  description = "Enable Bedrock Agent with action groups (requires enable_knowledge_base=true)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_guardrails" {
+  description = "Enable Bedrock Guardrails for content filtering"
+  type        = bool
+  default     = false
+}
+
 variable "enable_xray" {
   description = "Enable X-Ray tracing for Lambda functions"
   type        = bool
