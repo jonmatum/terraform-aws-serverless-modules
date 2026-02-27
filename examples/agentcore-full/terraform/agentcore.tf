@@ -39,6 +39,4 @@ resource "aws_bedrockagentcore_gateway_target" "lambda_mcp" {
       }
     }
   }
-
-  depends_on = [module.lambda_mcp]
 }

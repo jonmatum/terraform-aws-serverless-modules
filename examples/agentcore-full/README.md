@@ -296,6 +296,35 @@ aws s3 rm s3://$(terraform output -raw kb_bucket_name) --recursive
 terraform destroy -auto-approve
 ```
 
+### Known Issue: Gateway Deletion
+
+If you encounter this error during `terraform destroy`:
+
+```
+Error: deleting Bedrock AgentCore Gateway
+ValidationException: Gateway with ID: xxx has targets associated with it. 
+Delete all targets before deleting the gateway.
+```
+
+**Cause**: The AWS Bedrock AgentCore API requires gateway targets to be deleted before the gateway itself, but Terraform may attempt to delete them in the wrong order if targets are removed from state.
+
+**Workaround**:
+1. Manually delete the gateway and its targets via AWS Console:
+   - Navigate to Bedrock → AgentCore → Gateways
+   - Delete all targets first
+   - Then delete the gateway
+2. Remove the gateway from Terraform state:
+   ```bash
+   terraform state rm aws_bedrockagentcore_gateway.main
+   terraform state rm aws_bedrockagentcore_gateway_target.lambda_mcp
+   ```
+3. Continue with destroy:
+   ```bash
+   terraform destroy -auto-approve
+   ```
+
+**Note**: This is a limitation of the current AWS provider's handling of gateway target dependencies. The issue will be resolved in future provider versions.
+
 ## Architecture Details
 
 See [architecture.md](architecture.md) for detailed diagrams and explanations.
