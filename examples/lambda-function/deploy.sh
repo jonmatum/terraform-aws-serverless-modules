@@ -47,6 +47,15 @@ echo ""
 echo "Step 5: Deploying infrastructure..."
 terraform apply -auto-approve
 
+# Step 6: Force Lambda to pull new image
+echo ""
+echo "Step 6: Forcing Lambda function update..."
+FUNCTION_NAME=$(terraform output -raw function_name)
+aws lambda update-function-code \
+  --function-name ${FUNCTION_NAME} \
+  --image-uri ${ECR_REPO}:${IMAGE_TAG} \
+  --region ${AWS_REGION} > /dev/null
+
 echo ""
 echo "=== Deployment Complete ==="
 FUNCTION_URL=$(terraform output -raw function_url)
