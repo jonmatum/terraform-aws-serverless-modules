@@ -44,7 +44,7 @@ module "lambda_mcp" {
   memory_size        = 512
 
   enable_function_url    = true
-  function_url_auth_type = "AWS_IAM"
+  function_url_auth_type = "NONE" # WARNING: Publicly accessible - for testing only, not for production
 
   # Production reliability
   dead_letter_config_target_arn = var.enable_dlq ? aws_sqs_queue.lambda_mcp_dlq[0].arn : null

@@ -4,7 +4,7 @@ resource "random_id" "suffix" {
 
 # AgentCore Gateway with Guardrails
 resource "aws_bedrockagentcore_gateway" "main" {
-  name        = "${var.project_name}-gateway-v2"
+  name        = "${var.project_name}-gateway"
   description = "Comprehensive AgentCore Gateway with multiple targets"
   role_arn    = aws_iam_role.gateway.arn
 

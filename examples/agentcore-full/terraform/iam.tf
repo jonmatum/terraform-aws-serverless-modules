@@ -44,13 +44,14 @@ resource "aws_iam_role_policy" "gateway" {
 }
 
 # Allow gateway role to invoke Lambda function URL
+# NOTE: This permission is not needed when auth_type is NONE, but kept for documentation
 resource "aws_lambda_permission" "gateway_invoke" {
   statement_id           = "AllowBedrockAgentCoreGateway"
   action                 = "lambda:InvokeFunctionUrl"
   function_name          = module.lambda_mcp.function_name
   principal              = "bedrock-agentcore.amazonaws.com"
   source_arn             = aws_bedrockagentcore_gateway.main.gateway_arn
-  function_url_auth_type = "AWS_IAM"
+  function_url_auth_type = "NONE" # Changed from AWS_IAM for testing
 }
 
 # Knowledge Base IAM Role
