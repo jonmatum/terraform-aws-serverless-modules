@@ -49,6 +49,8 @@ module "ecs" {
 | [ecs](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/ecs) | Fargate service | Auto-scaling, Container Insights, Spot support |
 | [lambda](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/lambda) | Lambda function | Container images, DLQ, retry policies, alarms |
 | [alb](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/alb) | Application Load Balancer | Access logs, HTTPS, health checks |
+| [sqs](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/sqs) | Message queue | FIFO, DLQ, encryption, long polling |
+| [sns](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/sns) | Pub/sub messaging | Email, SQS, Lambda subscriptions, filtering |
 | [dynamodb](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/dynamodb) | NoSQL database | Encryption, PITR, auto-scaling |
 | [api-gateway](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway) | HTTP API (v2) | Throttling, logging, X-Ray tracing |
 | [api-gateway-v1](https://github.com/jonmatum/terraform-aws-serverless-modules/tree/main/modules/api-gateway-v1) | REST API | OpenAPI/Swagger support, VPC Link |
